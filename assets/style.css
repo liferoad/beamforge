@@ -1,0 +1,20 @@
+.panel-resize-handle {
+    background-color: #e5e7eb;
+    width: 2px;
+    transition: background-color 0.2s;
+}
+
+.panel-resize-handle:hover {
+    background-color: #94a3b8;
+    width: 4px;
+}
+
+.panel-group {
+    width: 100%;
+    height: 100%;
+}
+
+.panel {
+    background-color: white;
+    padding: 16px;
+}

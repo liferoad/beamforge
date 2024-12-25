@@ -5,6 +5,7 @@ import io
 # third party libraries
 import dash
 import dash_cytoscape as cyto
+import dash_resizable_panels as drp
 import networkx as nx
 import yaml
 from dash import Input, Output, State, dcc, html
@@ -18,60 +19,69 @@ app = dash.Dash(__name__)
 # Define the layout
 app.layout = html.Div(
     [
-        # Main container with flexbox
-        html.Div(
+        # Main container
+        drp.PanelGroup(
             [
                 # Left Panel
-                html.Div(
-                    [
-                        html.H3("Upload Beam YAML"),
-                        dcc.Upload(
-                            id="upload-data",
-                            children=html.Div(["Drag and Drop or ", html.A("Select Beam YAML File")]),
-                            style={
-                                "width": "100%",
-                                "height": "60px",
-                                "lineHeight": "60px",
-                                "borderWidth": "1px",
-                                "borderStyle": "dashed",
-                                "borderRadius": "5px",
-                                "textAlign": "center",
-                                "margin": "10px",
-                            },
-                            multiple=False,
-                            accept=".yaml,.yml",
-                        ),
-                    ],
-                    style={"width": "20%", "padding": "20px"},
+                drp.Panel(
+                    html.Div(
+                        [
+                            html.H3("Upload Beam YAML"),
+                            dcc.Upload(
+                                id="upload-data",
+                                children=html.Div(["Drag and Drop or ", html.A("Select Beam YAML File")]),
+                                style={
+                                    "width": "100%",
+                                    "height": "60px",
+                                    "lineHeight": "60px",
+                                    "borderWidth": "1px",
+                                    "borderStyle": "dashed",
+                                    "borderRadius": "5px",
+                                    "textAlign": "center",
+                                    "margin": "10px",
+                                },
+                                multiple=False,
+                                accept=".yaml,.yml",
+                            ),
+                        ]
+                    ),
+                    defaultSizePercentage=20,
                 ),
+                drp.PanelResizeHandle(className="panel-resize-handle"),
                 # Middle Panel
-                html.Div(
-                    [
-                        html.H3("Pipeline Graph"),
-                        cyto.Cytoscape(
-                            id="network-graph",
-                            layout={"name": "dagre"},
-                            style={"width": "100%", "height": "600px"},
-                            elements=[],
-                        ),
-                    ],
-                    style={"width": "60%", "padding": "20px"},
+                drp.Panel(
+                    html.Div(
+                        [
+                            html.H3("Pipeline Graph"),
+                            cyto.Cytoscape(
+                                id="network-graph",
+                                layout={"name": "dagre"},
+                                style={"width": "100%", "height": "600px"},
+                                elements=[],
+                            ),
+                        ]
+                    ),
+                    defaultSizePercentage=60,
                 ),
+                drp.PanelResizeHandle(className="panel-resize-handle"),
                 # Right Panel
-                html.Div(
-                    [
-                        html.H3("Transform Details"),
-                        html.Div(
-                            id="node-info",
-                            children=[html.P("Click a transform to see its details"), html.Div(id="node-data")],
-                        ),
-                    ],
-                    style={"width": "20%", "padding": "20px"},
+                drp.Panel(
+                    html.Div(
+                        [
+                            html.H3("Transform Details"),
+                            html.Div(
+                                id="node-info",
+                                children=[html.P("Click a transform to see its details"), html.Div(id="node-data")],
+                            ),
+                        ]
+                    ),
+                    defaultSizePercentage=20,
                 ),
             ],
-            style={"display": "flex", "flexDirection": "row", "height": "100vh"},
-        )
-    ]
+            direction="horizontal",
+        ),
+    ],
+    style={"height": "100vh"},
 )
 
 
