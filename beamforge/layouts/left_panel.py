@@ -1,6 +1,7 @@
 # third party libraries
 import dash_resizable_panels as drp
 from dash import dcc, html
+from dash_ace import DashAceEditor
 
 
 def create_left_panel():
@@ -26,20 +27,18 @@ def create_left_panel():
                 ),
                 html.Div(
                     [
-                        html.Pre(
+                        DashAceEditor(
                             id="yaml-content",
+                            value="",
+                            mode="yaml",
+                            theme="tomorrow",
+                            tabSize=2,
+                            enableLiveAutocompletion=True,
+                            showGutter=True,
                             style={
                                 "width": "95%",
+                                "height": "calc(100vh - 150px)",
                                 "margin": "10px",
-                                "fontFamily": "monospace",
-                                "whiteSpace": "pre-wrap",
-                                "wordWrap": "break-word",
-                                "backgroundColor": "#f5f5f5",
-                                "padding": "10px",
-                                "border": "1px solid #ddd",
-                                "borderRadius": "4px",
-                                "overflow": "auto",
-                                "maxHeight": "calc(100vh - 150px)",
                             },
                         ),
                     ],

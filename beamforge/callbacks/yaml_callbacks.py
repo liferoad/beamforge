@@ -8,7 +8,7 @@ from dash import Input, Output
 
 def register_yaml_callbacks(app):
     @app.callback(
-        Output("yaml-content", "children"),
+        Output("yaml-content", "value"),
         Input("upload-data", "contents"),
     )
     def update_yaml_content(contents):
