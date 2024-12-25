@@ -1,59 +1,103 @@
 # standard libraries
-from typing import Dict
+import base64
+import io
 
 # third party libraries
-import mesop as me
+import dash
+import dash_cytoscape as cyto
 import networkx as nx
 import yaml
+from dash import Input, Output, State, dcc, html
 
-yaml_content = None
+# Register the dagre layout
+cyto.load_extra_layouts()
+
+# Initialize the Dash app
+app = dash.Dash(__name__)
+
+# Define the layout
+app.layout = html.Div(
+    [
+        # Main container with flexbox
+        html.Div(
+            [
+                # Left Panel
+                html.Div(
+                    [
+                        html.H3("Upload Beam YAML"),
+                        dcc.Upload(
+                            id="upload-data",
+                            children=html.Div(["Drag and Drop or ", html.A("Select Beam YAML File")]),
+                            style={
+                                "width": "100%",
+                                "height": "60px",
+                                "lineHeight": "60px",
+                                "borderWidth": "1px",
+                                "borderStyle": "dashed",
+                                "borderRadius": "5px",
+                                "textAlign": "center",
+                                "margin": "10px",
+                            },
+                            multiple=False,
+                            accept=".yaml,.yml",
+                        ),
+                    ],
+                    style={"width": "20%", "padding": "20px"},
+                ),
+                # Middle Panel
+                html.Div(
+                    [
+                        html.H3("Pipeline Graph"),
+                        cyto.Cytoscape(
+                            id="network-graph",
+                            layout={"name": "dagre"},
+                            style={"width": "100%", "height": "600px"},
+                            elements=[],
+                        ),
+                    ],
+                    style={"width": "60%", "padding": "20px"},
+                ),
+                # Right Panel
+                html.Div(
+                    [
+                        html.H3("Transform Details"),
+                        html.Div(
+                            id="node-info",
+                            children=[html.P("Click a transform to see its details"), html.Div(id="node-data")],
+                        ),
+                    ],
+                    style={"width": "20%", "padding": "20px"},
+                ),
+            ],
+            style={"display": "flex", "flexDirection": "row", "height": "100vh"},
+        )
+    ]
+)
 
 
-@me.stateclass
-class State:
-    file: me.UploadedFile
-    yaml_content: dict = None
-
-
-def handle_upload(event: me.UploadEvent):
-    state = me.state(State)
-    state.file = event.file
-    # Parse YAML content
-    # state.yaml_content = yaml.safe_load(event.file.getvalue().decode())
-    global yaml_content
-    yaml_content = yaml.safe_load(event.file.getvalue().decode())
-
-
-def build_dag_from_yaml(yaml_content: Dict) -> nx.DiGraph:
-    """
-    Build a DAG from YAML pipeline content.
-
-    Args:
-        yaml_content: Parsed YAML dictionary containing pipeline configuration
-
-    Returns:
-        nx.DiGraph: A directed acyclic graph representing the pipeline
-    """
+def parse_beam_yaml(yaml_content):
+    """Parse Beam YAML and create a NetworkX graph."""
     G = nx.DiGraph()
+    data = yaml.safe_load(yaml_content)
 
-    # Get the pipeline section
-    pipeline = yaml_content.get("pipeline", {})
+    if "pipeline" not in data:
+        raise ValueError("No pipeline section found in YAML")
 
-    if pipeline.get("type") == "chain" or pipeline.get("type") is None:
-        transforms = pipeline.get("transforms", [])
-        # For chain type, create nodes for each transform and connect them sequentially
+    pipeline = data["pipeline"]
+    transforms = pipeline.get("transforms", [])
+    pipeline_type = pipeline.get("type", None)
+
+    # Handle both chain and regular pipeline types
+    if pipeline_type == "chain" or pipeline_type is None:
         prev_node = None
-        for i, transform in enumerate(transforms):
-            node_id = f"{transform.get('type')}_{i}"
-            node_attrs = {
-                "type": transform.get("type"),
-                "name": transform.get("name", ""),
-                "config": transform.get("config", {}),
-            }
-            # Add node to graph
-            G.add_node(node_id, **node_attrs)
+        for idx, transform in enumerate(transforms):
+            node_id = transform.get("name", f"transform_{idx}")
+            transform_type = transform.get("type", "Unknown")
 
-            # If there's a previous node, connect it to current node
+            # Add node with transform details
+            G.add_node(node_id, type=transform_type, config=transform.get("config", {}))
+
+            # Connect to previous node if exists
             if prev_node is not None:
                 G.add_edge(prev_node, node_id)
 
@@ -62,52 +106,50 @@ def build_dag_from_yaml(yaml_content: Dict) -> nx.DiGraph:
     return G
 
 
-def process_yaml_pipeline(yaml_content):
-    if yaml_content:
-        dag = build_dag_from_yaml(yaml_content)
+# Callback to handle file upload and update graph
+@app.callback(Output("network-graph", "elements"), Input("upload-data", "contents"), State("upload-data", "filename"))
+def update_graph(contents, filename):
+    if contents is None:
+        return []
 
-        # Print DAG information
-        me.text("DAG Nodes:")
-        for node in dag.nodes(data=True):
-            me.text(f"Node: {node[0]}")
-            me.text(f"Attributes: {node[1]}")
+    content_type, content_string = contents.split(",")
+    decoded = base64.b64decode(content_string)
 
-        me.text("\nDAG Edges:")
-        for edge in dag.edges():
-            me.text(f"{edge[0]} -> {edge[1]}")
+    try:
+        # Parse YAML and create NetworkX graph
+        yaml_content = io.StringIO(decoded.decode("utf-8"))
+        G = parse_beam_yaml(yaml_content)
+
+        elements = []
+
+        # Add nodes with styling
+        for node in G.nodes():
+            node_data = G.nodes[node]
+            elements.append(
+                {
+                    "data": {"id": str(node), "label": f"{node}\n({node_data['type']})", "type": node_data["type"]},
+                    "classes": "transform-node",
+                }
+            )
+
+        # Add edges
+        for source, target in G.edges():
+            elements.append({"data": {"source": str(source), "target": str(target), "id": f"{source}-{target}"}})
+
+        return elements
+    except Exception as e:
+        print(f"Error processing YAML file: {e}")
+        return []
 
 
-@me.page(path="/")
-def app():
-    global yaml_content
+# Callback to update node information when clicked
+@app.callback(Output("node-data", "children"), Input("network-graph", "tapNodeData"))
+def display_node_data(node_data):
+    if not node_data:
+        return "No transform selected"
 
-    with me.box(style=me.Style(display="grid", grid_template_columns="1fr 2fr 1fr", height="100%")):
-        # Left Sidebar
-        with me.box(style=me.Style(background="#f0f0f0", padding=me.Padding.all(24), overflow_y="auto")):
-            me.text("Upload YAML")
-            with me.content_uploader(
-                accepted_file_types=["text/yaml"],
-                on_upload=handle_upload,
-                type="icon",
-                style=me.Style(font_weight="bold"),
-            ):
-                me.icon("upload")
-            me.divider()
-            if yaml_content:
-                # Display the parsed YAML content
-                me.textarea(
-                    value=yaml.dump(yaml_content, default_flow_style=False, sort_keys=False),
-                    appearance="outline",
-                    style=me.Style(width="100%"),
-                    autosize=True,
-                )
-        # Main content
-        with me.box(style=me.Style(padding=me.Padding.all(24), overflow_y="auto")):
-            me.text("YAML Content:")
-            if yaml_content:
-                me.text("\nPipeline DAG Analysis:")
-                process_yaml_pipeline(yaml_content)
+    return [html.H4(f"Transform: {node_data['label']}"), html.P(f"Type: {node_data['type']}")]
 
-        # Right Sidebar
-        with me.box(style=me.Style(background="#f0f0f0", padding=me.Padding.all(24), overflow_y="auto")):
-            me.text("Right Sidebar")
+
+if __name__ == "__main__":
+    app.run_server(debug=True)

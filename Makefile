@@ -68,4 +68,4 @@ clean: clean-lite ## Remove virtual environment, downloaded models, etc
 	@echo "run 'make init'"
 
 run: ## Run the application
-	@mesop main.py
+	@./venv/bin/python3 main.py
