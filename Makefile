@@ -47,6 +47,7 @@ init: init-venv ## Init virtual environment
 	@./venv/bin/python3 -m pip install -r requirements.dev.txt
 	@./venv/bin/python3 -m pre_commit install --install-hooks --overwrite
 	@echo "use 'source venv/bin/activate' to activate venv "
+	@./venv/bin/python3 -m pip install -e .
 	
 format: ## Run formatter on source code
 	@./venv/bin/python3 -m black --config=pyproject.toml .
@@ -68,4 +69,4 @@ clean: clean-lite ## Remove virtual environment, downloaded models, etc
 	@echo "run 'make init'"
 
 run: ## Run the application
-	@./venv/bin/python3 main.py
+	@./venv/bin/python3 beamforge/app.py
