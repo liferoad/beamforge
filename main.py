@@ -91,14 +91,17 @@ app.layout = html.Div(
                                             "content": "data(id)",
                                             "text-valign": "center",
                                             "text-halign": "center",
-                                            "width": "100px",  # Reduced width
-                                            "height": "25px",  # Reduced height
-                                            "background-color": "#f8f9fa",
-                                            "border-color": "#dee2e6",
-                                            "border-width": "1px",
-                                            "padding": "3px",  # Reduced padding
-                                            "font-size": "8px",  # Smaller font
+                                            "width": "150px",  # Increased width for better readability
+                                            "height": "40px",  # Increased height
+                                            "background-color": "#e3f2fd",  # Light blue background
+                                            "border-color": "#1976d2",  # Darker blue border
+                                            "border-width": "2px",
+                                            "padding": "8px",
+                                            "font-family": "Roboto, Arial, sans-serif",  # Modern font
+                                            "font-size": "12px",  # Larger font
+                                            "font-weight": "500",  # Semi-bold text
                                             "text-wrap": "wrap",
+                                            "color": "#1565c0",  # Dark blue text
                                         },
                                     },
                                     {
@@ -106,9 +109,18 @@ app.layout = html.Div(
                                         "style": {
                                             "curve-style": "bezier",
                                             "target-arrow-shape": "triangle",
-                                            "line-color": "#cccccc",
-                                            "target-arrow-color": "#cccccc",
-                                            "width": 0.5,  # Thinner edges
+                                            "line-color": "#90caf9",  # Light blue edges
+                                            "target-arrow-color": "#90caf9",
+                                            "width": 1.5,  # Slightly thicker edges
+                                            "arrow-scale": 1.2,  # Larger arrows
+                                        },
+                                    },
+                                    {
+                                        "selector": "node:selected",  # Style for selected nodes
+                                        "style": {
+                                            "background-color": "#bbdefb",
+                                            "border-color": "#0d47a1",
+                                            "border-width": "3px",
                                         },
                                     },
                                 ],
