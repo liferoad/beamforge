@@ -6,6 +6,8 @@ import mesop as me
 import networkx as nx
 import yaml
 
+yaml_content = None
+
 
 @me.stateclass
 class State:
@@ -17,8 +19,9 @@ def handle_upload(event: me.UploadEvent):
     state = me.state(State)
     state.file = event.file
     # Parse YAML content
+    # state.yaml_content = yaml.safe_load(event.file.getvalue().decode())
+    global yaml_content
     yaml_content = yaml.safe_load(event.file.getvalue().decode())
-    state.yaml_content = yaml_content
 
 
 def build_dag_from_yaml(yaml_content: Dict) -> nx.DiGraph:
@@ -36,7 +39,7 @@ def build_dag_from_yaml(yaml_content: Dict) -> nx.DiGraph:
     # Get the pipeline section
     pipeline = yaml_content.get("pipeline", {})
 
-    if pipeline.get("type") == "chain":
+    if pipeline.get("type") == "chain" or pipeline.get("type") is None:
         transforms = pipeline.get("transforms", [])
         # For chain type, create nodes for each transform and connect them sequentially
         prev_node = None
@@ -59,10 +62,9 @@ def build_dag_from_yaml(yaml_content: Dict) -> nx.DiGraph:
     return G
 
 
-def process_yaml_pipeline():
-    s = me.state(State)
-    if s.yaml_content:
-        dag = build_dag_from_yaml(s.yaml_content)
+def process_yaml_pipeline(yaml_content):
+    if yaml_content:
+        dag = build_dag_from_yaml(yaml_content)
 
         # Print DAG information
         me.text("DAG Nodes:")
@@ -77,7 +79,7 @@ def process_yaml_pipeline():
 
 @me.page(path="/")
 def app():
-    s = me.state(State)
+    global yaml_content
 
     with me.box(style=me.Style(display="grid", grid_template_columns="1fr 2fr 1fr", height="100%")):
         # Left Sidebar
@@ -91,10 +93,10 @@ def app():
             ):
                 me.icon("upload")
             me.divider()
-            if s.yaml_content:
+            if yaml_content:
                 # Display the parsed YAML content
                 me.textarea(
-                    value=yaml.dump(s.yaml_content, default_flow_style=False, sort_keys=False),
+                    value=yaml.dump(yaml_content, default_flow_style=False, sort_keys=False),
                     appearance="outline",
                     style=me.Style(width="100%"),
                     autosize=True,
@@ -102,9 +104,9 @@ def app():
         # Main content
         with me.box(style=me.Style(padding=me.Padding.all(24), overflow_y="auto")):
             me.text("YAML Content:")
-            if s.yaml_content:
+            if yaml_content:
                 me.text("\nPipeline DAG Analysis:")
-                process_yaml_pipeline()
+                process_yaml_pipeline(yaml_content)
 
         # Right Sidebar
         with me.box(style=me.Style(background="#f0f0f0", padding=me.Padding.all(24), overflow_y="auto")):
