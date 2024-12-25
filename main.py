@@ -31,7 +31,7 @@ app.layout = html.Div(
                                 id="upload-data",
                                 children=html.Div(["Drag and Drop or ", html.A("Select Beam YAML File")]),
                                 style={
-                                    "width": "100%",
+                                    "width": "80%",
                                     "height": "60px",
                                     "lineHeight": "60px",
                                     "borderWidth": "1px",
@@ -42,6 +42,28 @@ app.layout = html.Div(
                                 },
                                 multiple=False,
                                 accept=".yaml,.yml",
+                            ),
+                            # Replace Textarea with a Div containing pre element
+                            html.Div(
+                                [
+                                    html.Pre(
+                                        id="yaml-content",
+                                        style={
+                                            "width": "95%",
+                                            "margin": "10px",
+                                            "fontFamily": "monospace",
+                                            "whiteSpace": "pre-wrap",
+                                            "wordWrap": "break-word",
+                                            "backgroundColor": "#f5f5f5",
+                                            "padding": "10px",
+                                            "border": "1px solid #ddd",
+                                            "borderRadius": "4px",
+                                            "overflow": "auto",
+                                            "maxHeight": "calc(100vh - 150px)",  # Adjust based on other elements
+                                        },
+                                    ),
+                                ],
+                                style={"height": "calc(100% - 100px)", "overflow": "auto"},
                             ),
                         ]
                     ),
@@ -55,11 +77,50 @@ app.layout = html.Div(
                             html.H3("Pipeline Graph"),
                             cyto.Cytoscape(
                                 id="network-graph",
-                                layout={"name": "dagre"},
-                                style={"width": "100%", "height": "600px"},
+                                layout={"name": "dagre", "rankDir": "TB", "rankSep": 30, "nodeSep": 50, "padding": 10},
+                                style={
+                                    "width": "100%",
+                                    "height": "calc(100vh - 100px)",
+                                    "position": "absolute",
+                                },
+                                stylesheet=[
+                                    {
+                                        "selector": "node",
+                                        "style": {
+                                            "shape": "rectangle",
+                                            "content": "data(id)",
+                                            "text-valign": "center",
+                                            "text-halign": "center",
+                                            "width": "100px",  # Reduced width
+                                            "height": "25px",  # Reduced height
+                                            "background-color": "#f8f9fa",
+                                            "border-color": "#dee2e6",
+                                            "border-width": "1px",
+                                            "padding": "3px",  # Reduced padding
+                                            "font-size": "8px",  # Smaller font
+                                            "text-wrap": "wrap",
+                                        },
+                                    },
+                                    {
+                                        "selector": "edge",
+                                        "style": {
+                                            "curve-style": "bezier",
+                                            "target-arrow-shape": "triangle",
+                                            "line-color": "#cccccc",
+                                            "target-arrow-color": "#cccccc",
+                                            "width": 0.5,  # Thinner edges
+                                        },
+                                    },
+                                ],
                                 elements=[],
                             ),
-                        ]
+                        ],
+                        style={
+                            "height": "100%",
+                            "position": "relative",
+                            "display": "flex",
+                            "flexDirection": "column",
+                        },
                     ),
                     defaultSizePercentage=60,
                 ),
@@ -80,6 +141,8 @@ app.layout = html.Div(
             ],
             direction="horizontal",
         ),
+        # Add a dummy div to trigger the reset
+        html.Div(id="reset-trigger", style={"display": "none"}),
     ],
     style={"height": "100vh"},
 )
@@ -116,8 +179,29 @@ def parse_beam_yaml(yaml_content):
     return G
 
 
-# Callback to handle file upload and update graph
-@app.callback(Output("network-graph", "elements"), Input("upload-data", "contents"), State("upload-data", "filename"))
+# Add the clientside callback for fitting the graph
+app.clientside_callback(
+    """
+    function(elements) {
+        if (elements && elements.length > 0) {
+            const cy = document.getElementById('network-graph')._cyreg.cy;
+            setTimeout(() => cy.fit(), 100);
+        }
+        return elements;
+    }
+    """,
+    Output("network-graph", "elements"),
+    Input("network-graph", "elements"),
+)
+
+
+# Update the main graph callback
+@app.callback(
+    Output("network-graph", "elements", allow_duplicate=True),
+    Input("upload-data", "contents"),
+    State("upload-data", "filename"),
+    prevent_initial_call=True,
+)
 def update_graph(contents, filename):
     if contents is None:
         return []
@@ -126,7 +210,6 @@ def update_graph(contents, filename):
     decoded = base64.b64decode(content_string)
 
     try:
-        # Parse YAML and create NetworkX graph
         yaml_content = io.StringIO(decoded.decode("utf-8"))
         G = parse_beam_yaml(yaml_content)
 
@@ -137,7 +220,7 @@ def update_graph(contents, filename):
             node_data = G.nodes[node]
             elements.append(
                 {
-                    "data": {"id": str(node), "label": f"{node}\n({node_data['type']})", "type": node_data["type"]},
+                    "data": {"id": str(node), "type": node_data["type"]},
                     "classes": "transform-node",
                 }
             )
@@ -158,7 +241,28 @@ def display_node_data(node_data):
     if not node_data:
         return "No transform selected"
 
-    return [html.H4(f"Transform: {node_data['label']}"), html.P(f"Type: {node_data['type']}")]
+    return [html.H4(f"Transform: {node_data['id']}"), html.P(f"Type: {node_data['type']}")]
+
+
+# Update the callback to work with html.Pre
+@app.callback(
+    Output("yaml-content", "children"),  # Changed from "value" to "children"
+    Input("upload-data", "contents"),
+)
+def update_yaml_content(contents):
+    if contents is None:
+        return "YAML content will appear here..."
+
+    content_type, content_string = contents.split(",")
+    decoded = base64.b64decode(content_string)
+
+    try:
+        # Parse YAML to ensure it's valid and format it
+        yaml_dict = yaml.safe_load(decoded)
+        formatted_yaml = yaml.dump(yaml_dict, default_flow_style=False, sort_keys=False)
+        return formatted_yaml
+    except Exception as e:
+        return f"Error processing YAML file: {str(e)}"
 
 
 if __name__ == "__main__":
