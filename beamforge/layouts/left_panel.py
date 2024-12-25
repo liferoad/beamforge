@@ -35,6 +35,7 @@ def create_left_panel():
                             tabSize=2,
                             enableLiveAutocompletion=True,
                             showGutter=True,
+                            readOnly=True,
                             style={
                                 "width": "95%",
                                 "height": "calc(100vh - 150px)",
