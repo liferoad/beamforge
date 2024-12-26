@@ -9,7 +9,7 @@ def get_stylesheet():
         {
             "selector": "node",
             "style": {
-                "shape": "rectangle",
+                "shape": "roundrectangle",
                 "content": "data(id)",
                 "text-valign": "center",
                 "text-halign": "center",
@@ -59,7 +59,7 @@ def create_middle_panel():
                         "width": "100%",
                         "height": "calc(100vh - 100px)",
                         "position": "absolute",
-                        "border": "1px solid #ddd",
+                        "border": "1px solid #FFA500",
                         "borderRadius": "4px",
                         "backgroundColor": "#fff",
                     },
