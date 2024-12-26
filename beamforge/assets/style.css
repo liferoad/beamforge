@@ -19,6 +19,15 @@
     padding: 16px;
 }
 
-.hover-button:hover {
-    background-color: #2100b3;  /* Darker shade for hover effect */
+.beam-button {
+    margin: 5px;
+    padding: 10px;
+    background-color: #FF6F20;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+.beam-button:hover {
+    background-color:  #f1a009; /* color for hover effect */
 }

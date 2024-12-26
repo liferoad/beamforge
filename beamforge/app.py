@@ -10,7 +10,7 @@ from beamforge.layouts.main_layout import create_layout
 cyto.load_extra_layouts()
 
 # Initialize the Dash app
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, title="BeamForge - Visual Builder with Beam YAML")
 
 # Set the layout
 app.layout = create_layout()
