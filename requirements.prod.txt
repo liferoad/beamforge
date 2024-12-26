@@ -25,3 +25,4 @@ networkx
 pyyaml
 dash-resizable-panels
 dash-ace
+dash-bootstrap-components

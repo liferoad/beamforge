@@ -1,4 +1,5 @@
 # third party libraries
+import dash_bootstrap_components as dbc
 import dash_resizable_panels as drp
 from dash import html
 
@@ -10,7 +11,17 @@ def create_right_panel():
                 html.H3("Transform Details"),
                 html.Div(
                     id="node-info",
-                    children=[html.P("Click a transform to see its details"), html.Div(id="node-data")],
+                    children=[
+                        dbc.Card(
+                            children=[
+                                dbc.CardBody(
+                                    [
+                                        html.Div(id="node-data"),
+                                    ]
+                                )
+                            ]
+                        )
+                    ],
                 ),
             ]
         ),

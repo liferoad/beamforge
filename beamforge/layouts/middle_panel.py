@@ -15,15 +15,15 @@ def get_stylesheet():
                 "text-halign": "center",
                 "width": "150px",
                 "height": "40px",
-                "background-color": "#e3f2fd",
-                "border-color": "#1976d2",
-                "border-width": "2px",
+                "background-color": "rgba(255, 165, 32, 0.5)",
+                "border-color": "#B0B0B0",
+                "border-width": "1px",
                 "padding": "8px",
                 "font-family": "Roboto, Arial, sans-serif",
                 "font-size": "12px",
                 "font-weight": "500",
                 "text-wrap": "wrap",
-                "color": "#1565c0",
+                "color": "#FFFFFF",
             },
         },
         {
@@ -31,18 +31,18 @@ def get_stylesheet():
             "style": {
                 "curve-style": "bezier",
                 "target-arrow-shape": "triangle",
-                "line-color": "#90caf9",
-                "target-arrow-color": "#90caf9",
-                "width": 1.5,
+                "line-color": "#B0B0B0",
+                "target-arrow-color": "#B0B0B0",
+                "width": 1,
                 "arrow-scale": 1.2,
             },
         },
         {
             "selector": "node:selected",
             "style": {
-                "background-color": "#bbdefb",
-                "border-color": "#0d47a1",
-                "border-width": "3px",
+                "background-color": "rgba(255, 111, 32, 0.8)",
+                "border-color": "#000000",
+                "border-width": "1px",
             },
         },
     ]
@@ -52,7 +52,6 @@ def create_middle_panel():
     return drp.Panel(
         html.Div(
             [
-                html.H3("Pipeline Graph"),
                 cyto.Cytoscape(
                     id="network-graph",
                     layout={"name": "dagre", "rankDir": "TB", "rankSep": 30, "nodeSep": 50, "padding": 10},
@@ -60,6 +59,9 @@ def create_middle_panel():
                         "width": "100%",
                         "height": "calc(100vh - 100px)",
                         "position": "absolute",
+                        "border": "1px solid #ddd",
+                        "borderRadius": "4px",
+                        "backgroundColor": "#fff",
                     },
                     stylesheet=get_stylesheet(),
                     elements=[],

@@ -1,9 +1,12 @@
 # standard libraries
 import base64
 import io
+import json
 
 # third party libraries
+import dash_bootstrap_components as dbc
 from dash import Input, Output, State, html
+from dash_ace import DashAceEditor
 from utils.yaml_parser import parse_beam_yaml
 
 
@@ -71,21 +74,30 @@ def register_graph_callbacks(app):
         if not node_data:
             return "Click a node to see its details"
 
-        # Create a formatted display of node data
+        # Create a formatted display of node data using dbc.Card with a custom background color
         details = [
-            html.H4(f"Transform: {node_data['id']}"),
-            html.P(f"Type: {node_data['type']}"),
-            html.H5("Configuration:"),
-            html.Pre(
-                str(node_data["config"]),
-                style={
-                    "whiteSpace": "pre-wrap",
-                    "wordBreak": "break-all",
-                    "backgroundColor": "#f5f5f5",
-                    "padding": "10px",
-                    "borderRadius": "4px",
-                },
-            ),
+            dbc.Card(
+                [
+                    dbc.CardHeader(
+                        f"Transform: {node_data['id']}", className="text-white"
+                    ),  # Keep text white for contrast
+                    dbc.CardBody(
+                        [
+                            html.H5(f"Type: {node_data['type']}", className="text-info"),
+                            html.H5("Configuration:", className="mt-3"),
+                            DashAceEditor(
+                                value=json.dumps(node_data["config"], indent=4),
+                                style={"width": "100%", "height": "200px"},
+                                theme="tomorrow",
+                                mode="json",
+                                readOnly=True,
+                            ),
+                        ]
+                    ),
+                ],
+                style={"backgroundColor": "#f8f9fa", "border": "1px solid #dee2e6"},
+                className="shadow-sm",
+            )  # Light background with border
         ]
 
         return html.Div(details)
