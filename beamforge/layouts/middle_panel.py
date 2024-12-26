@@ -52,19 +52,72 @@ def create_middle_panel():
     return drp.Panel(
         html.Div(
             [
-                cyto.Cytoscape(
-                    id="network-graph",
-                    layout={"name": "dagre", "rankDir": "TB", "rankSep": 30, "nodeSep": 50, "padding": 10},
-                    style={
-                        "width": "100%",
-                        "height": "calc(100vh - 100px)",
-                        "position": "absolute",
-                        "border": "1px solid #FFA500",
-                        "borderRadius": "4px",
-                        "backgroundColor": "#fff",
-                    },
-                    stylesheet=get_stylesheet(),
-                    elements=[],
+                # Toolbar for zoom controls
+                html.Div(
+                    [
+                        html.Button(
+                            "Zoom In",
+                            id="zoom-in",
+                            n_clicks=0,
+                            style={
+                                "margin": "5px",
+                                "padding": "10px",
+                                "backgroundColor": "#007BFF",
+                                "color": "white",
+                                "border": "none",
+                                "borderRadius": "4px",
+                            },
+                            className="hover-button",
+                        ),
+                        html.Button(
+                            "Zoom Out",
+                            id="zoom-out",
+                            n_clicks=0,
+                            style={
+                                "margin": "5px",
+                                "padding": "10px",
+                                "backgroundColor": "#007BFF",
+                                "color": "white",
+                                "border": "none",
+                                "borderRadius": "4px",
+                            },
+                            className="hover-button",
+                        ),
+                        html.Button(
+                            "Reset View",
+                            id="reset-view",
+                            n_clicks=0,
+                            style={
+                                "margin": "5px",
+                                "padding": "10px",
+                                "backgroundColor": "#007BFF",
+                                "color": "white",
+                                "border": "none",
+                                "borderRadius": "4px",
+                            },
+                            className="hover-button",
+                        ),
+                    ],
+                    style={"margin-bottom": "10px", "position": "relative", "zIndex": 10},
+                ),
+                html.Div(
+                    [
+                        cyto.Cytoscape(
+                            id="network-graph",
+                            layout={"name": "dagre", "rankDir": "TB", "rankSep": 30, "nodeSep": 50, "padding": 10},
+                            style={
+                                "width": "100%",
+                                "height": "calc(100vh - 120px)",
+                                "position": "absolute",
+                                "border": "1px solid #FFA500",
+                                "borderRadius": "4px",
+                                "backgroundColor": "#fff",
+                            },
+                            stylesheet=get_stylesheet(),
+                            elements=[],
+                            zoom=1.0,
+                        ),
+                    ]
                 ),
             ],
             style={

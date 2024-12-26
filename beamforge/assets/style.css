@@ -1,5 +1,5 @@
 .panel-resize-handle {
-    background-color: #FFA500;
+    background-color: #FF6F20;
     width: 2px;
     transition: background-color 0.2s;
 }
@@ -17,4 +17,8 @@
 .panel {
     background-color: white;
     padding: 16px;
+}
+
+.hover-button:hover {
+    background-color: #2100b3;  /* Darker shade for hover effect */
 }

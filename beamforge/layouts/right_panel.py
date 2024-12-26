@@ -8,7 +8,12 @@ def create_right_panel():
     return drp.Panel(
         html.Div(
             [
-                html.H3("Transform Details"),
+                html.H3(
+                    "Transform Details",
+                    style={
+                        "color": "#FF6F20",
+                    },
+                ),
                 html.Div(
                     id="node-info",
                     children=[

@@ -4,6 +4,7 @@ import io
 import json
 
 # third party libraries
+import dash
 import dash_bootstrap_components as dbc
 from dash import Input, Output, State, html
 from dash_ace import DashAceEditor
@@ -78,13 +79,16 @@ def register_graph_callbacks(app):
         details = [
             dbc.Card(
                 [
-                    dbc.CardHeader(
-                        f"Transform: {node_data['id']}", className="text-white"
-                    ),  # Keep text white for contrast
                     dbc.CardBody(
                         [
-                            html.H5(f"Type: {node_data['type']}", className="text-info"),
-                            html.H5("Configuration:", className="mt-3"),
+                            html.H4(
+                                f"Transform: {node_data['id']}",
+                                style={
+                                    "color": "#FF6F20",
+                                },
+                            ),
+                            html.H5(f"Type: {node_data['type']}"),
+                            html.H5("Configuration:"),
                             DashAceEditor(
                                 value=json.dumps(node_data["config"], indent=4),
                                 style={"width": "100%", "height": "200px"},
@@ -95,9 +99,38 @@ def register_graph_callbacks(app):
                         ]
                     ),
                 ],
-                style={"backgroundColor": "#f8f9fa", "border": "1px solid #dee2e6"},
+                style={"backgroundColor": "#fff", "border": "1px solid #dee2e6"},
                 className="shadow-sm",
             )  # Light background with border
         ]
 
         return html.Div(details)
+
+    @app.callback(
+        Output("network-graph", "zoom"),
+        Input("zoom-in", "n_clicks"),
+        Input("zoom-out", "n_clicks"),
+        Input("reset-view", "n_clicks"),
+        Input("network-graph", "zoom"),
+        prevent_initial_call=True,
+    )
+    def zoom_graph(zoom_in_clicks, zoom_out_clicks, reset_view_clicks, current_zoom):
+        ctx = dash.callback_context
+
+        if not ctx.triggered:
+            return dash.no_update
+
+        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+        # Use the current zoom level as the base
+        zoom_level = current_zoom if current_zoom is not None else 1.0  # Default to 1.0 if None
+
+        if triggered_id == "zoom-in":
+            zoom_level += 0.1  # Increase zoom level
+        elif triggered_id == "zoom-out":
+            zoom_level -= 0.1  # Decrease zoom level
+            zoom_level = max(0.1, zoom_level)  # Prevent zooming out too much
+        elif triggered_id == "reset-view":
+            zoom_level = 1.0  # Reset zoom to default
+
+        return zoom_level
