@@ -99,7 +99,7 @@ def register_graph_callbacks(app):
                         ]
                     ),
                 ],
-                style={"backgroundColor": "#fff", "border": "1px solid #dee2e6"},
+                style={"backgroundColor": "#F5F5F5", "border": "1px solid #dee2e6"},
                 className="shadow-sm",
             )  # Light background with border
         ]

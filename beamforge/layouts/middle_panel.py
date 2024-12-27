@@ -80,18 +80,26 @@ def create_middle_panel():
                     [
                         cyto.Cytoscape(
                             id="network-graph",
-                            layout={"name": "dagre", "rankDir": "TB", "rankSep": 30, "nodeSep": 50, "padding": 10},
+                            layout={
+                                "name": "dagre",
+                                "rankDir": "TB",
+                                "rankSep": 30,
+                                "nodeSep": 50,
+                                "padding": 10,
+                                "animate": True,
+                            },
                             style={
                                 "width": "100%",
-                                "height": "calc(100vh - 120px)",
+                                "height": "calc(80vh - 120px)",
                                 "position": "absolute",
                                 # "border": "1px solid #FFA500",
                                 "borderRadius": "4px",
-                                "backgroundColor": "#fff",
+                                "backgroundColor": "#F5F5F5",
                             },
                             stylesheet=get_stylesheet(),
                             elements=[],
                             zoom=1.0,
+                            pan={"x": 0, "y": 0},
                         ),
                     ]
                 ),

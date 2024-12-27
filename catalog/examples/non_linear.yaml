@@ -1,0 +1,37 @@
+pipeline:
+  transforms:
+    - type: ReadFromCsv
+      name: ReadLeft
+      config:
+        path: /path/to/left*.csv
+
+    - type: ReadFromCsv
+      name: ReadRight
+      config:
+        path: /path/to/right*.csv
+
+    - type: Sql
+      config:
+        query: select A.col1, B.col2 from A join B using (col3)
+      input:
+        A: ReadLeft
+        B: ReadRight
+
+    - type: WriteToJson
+      name: WriteAll
+      input: Sql
+      config:
+        path: /path/to/all.json
+
+    - type: Filter
+      name: FilterToBig
+      input: Sql
+      config:
+        language: python
+        keep: "col2 > 100"
+
+    - type: WriteToCsv
+      name: WriteBig
+      input: FilterToBig
+      config:
+        path: /path/to/big.csv
