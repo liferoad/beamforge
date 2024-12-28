@@ -1,7 +1,7 @@
 # third party libraries
 import dash_cytoscape as cyto
 import dash_resizable_panels as drp
-from dash import html
+from dash import dcc, html
 
 
 def get_stylesheet():
@@ -91,7 +91,8 @@ def create_middle_panel():
                             style={
                                 "width": "100%",
                                 "height": "calc(80vh - 120px)",
-                                "position": "absolute",
+                                "overflow": "auto",
+                                # "position": "absolute",
                                 # "border": "1px solid #FFA500",
                                 "borderRadius": "4px",
                                 "backgroundColor": "#F5F5F5",
@@ -100,6 +101,23 @@ def create_middle_panel():
                             elements=[],
                             zoom=1.0,
                             pan={"x": 0, "y": 0},
+                        ),
+                    ]
+                ),
+                html.Div(
+                    [
+                        dcc.Textarea(
+                            id="graph-log",
+                            value="",
+                            readOnly=True,  # Prevent direct user editing
+                            style={
+                                "width": "100%",
+                                "height": "200px",
+                                "overflow": "auto",
+                                "fontFamily": "monospace",
+                                "border": "1px solid #ccc",
+                                "resize": "vertical",
+                            },
                         ),
                     ]
                 ),

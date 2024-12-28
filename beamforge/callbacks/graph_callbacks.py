@@ -134,3 +134,18 @@ def register_graph_callbacks(app):
             zoom_level = 1.0  # Reset zoom to default
 
         return zoom_level
+
+    @app.callback(
+        Output("graph-log", "value"),
+        Input("network-graph", "tapNode"),
+        Input("network-graph", "tapEdge"),
+        Input("graph-log", "value"),
+        # Add other inputs as needed for more interactions
+    )
+    def update_log(tapNode, tapEdge, log_message):
+        if tapNode:
+            log_message += f"Node tapped: {tapNode['data']['id']}\n"
+        if tapEdge:
+            log_message += f"Edge tapped: {tapEdge['data']['id']}\n"
+        # Add other log messages based on graph interactions
+        return log_message
