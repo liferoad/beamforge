@@ -38,6 +38,13 @@ def get_stylesheet():
             },
         },
         {
+            "selector": "edge:selected",
+            "style": {
+                "line-color": "black",
+                "target-arrow-color": "black",
+            },
+        },
+        {
             "selector": "node:selected",
             "style": {
                 "background-color": "rgba(255, 111, 32, 0.8)",
