@@ -12,21 +12,6 @@ from utils.yaml_parser import parse_beam_yaml
 
 
 def register_graph_callbacks(app):
-    # Clientside callback for fitting the graph
-    app.clientside_callback(
-        """
-        function(elements) {
-            if (elements && elements.length > 0) {
-                const cy = document.getElementById('network-graph')._cyreg.cy;
-                setTimeout(() => cy.fit(), 100);
-            }
-            return elements;
-        }
-        """,
-        Output("network-graph", "elements"),
-        Input("network-graph", "elements"),
-    )
-
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Input("upload-data", "contents"),
