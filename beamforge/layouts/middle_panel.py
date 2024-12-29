@@ -90,8 +90,14 @@ def create_middle_panel():
                         html.Button(
                             "Add Node",
                             id="add-node-button",
+                            className="beam-button",
+                        ),
+                        html.Button(
+                            "Add Edge",
+                            id="add-edge-button",
                             n_clicks=0,
                             className="beam-button",
+                            disabled=True,
                         ),
                     ],
                     style={"margin-bottom": "10px", "position": "relative", "zIndex": 10},

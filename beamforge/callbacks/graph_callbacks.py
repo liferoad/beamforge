@@ -196,3 +196,41 @@ def register_graph_callbacks(app):
             elements = elements + [{"data": {"id": new_node_id, "type": "UNKNOWN", "config": {}}}]
             log_message += f"Added node: {new_node_id}\n"
         return elements, log_message
+
+    @app.callback(
+        Output("add-edge-button", "disabled"),
+        Input("network-graph", "selectedNodeData"),
+    )
+    def enable_add_edge_button(selected_nodes):
+        return not selected_nodes or len(selected_nodes) != 2
+
+    @app.callback(
+        Output("network-graph", "elements", allow_duplicate=True),
+        Output("graph-log", "value", allow_duplicate=True),
+        Input("add-edge-button", "n_clicks"),
+        State("network-graph", "elements"),
+        State("network-graph", "selectedNodeData"),
+        State("graph-log", "value"),
+        prevent_initial_call=True,
+    )
+    def add_edge_between_nodes(n_clicks, elements, selected_nodes, log_message):
+        if n_clicks > 0 and selected_nodes and len(selected_nodes) == 2:
+            source_id = selected_nodes[0]["id"]
+            target_id = selected_nodes[1]["id"]
+
+            # Check if the edge already exists (undirected graph)
+            edge_exists = any(
+                (el["data"].get("source") == source_id and el["data"].get("target") == target_id)
+                or (el["data"].get("source") == target_id and el["data"].get("target") == source_id)
+                for el in elements
+                if "source" in el["data"]
+            )
+
+            if not edge_exists:
+                new_edge = {"data": {"source": source_id, "target": target_id}}
+                elements.append(new_edge)
+                log_message += f"Added edge between {source_id} and {target_id}\n"
+            else:
+                log_message += f"Edge already exists between {source_id} and {target_id}\n"
+
+        return elements, log_message
