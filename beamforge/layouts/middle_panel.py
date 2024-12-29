@@ -87,6 +87,12 @@ def create_middle_panel():
                             className="beam-button",
                             disabled=True,
                         ),
+                        html.Button(
+                            "Add Node",
+                            id="add-node-button",
+                            n_clicks=0,
+                            className="beam-button",
+                        ),
                     ],
                     style={"margin-bottom": "10px", "position": "relative", "zIndex": 10},
                 ),

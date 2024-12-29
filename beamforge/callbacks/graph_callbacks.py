@@ -180,4 +180,19 @@ def register_graph_callbacks(app):
                     if element["data"]["id"] not in node_ids_to_remove:
                         new_elements.append(element)
             return new_elements, log_message
+        return new_elements, log_message
+
+    @app.callback(
+        Output("network-graph", "elements", allow_duplicate=True),
+        Output("graph-log", "value", allow_duplicate=True),
+        Input("add-node-button", "n_clicks"),
+        State("network-graph", "elements"),
+        State("graph-log", "value"),
+        prevent_initial_call=True,
+    )
+    def add_new_node(n_clicks, elements, log_message):
+        if n_clicks > 0:
+            new_node_id = f"node-{len([el for el in elements if 'source' not in el['data']]) + 1}"
+            elements = elements + [{"data": {"id": new_node_id, "type": "UNKNOWN", "config": {}}}]
+            log_message += f"Added node: {new_node_id}\n"
         return elements, log_message
