@@ -59,48 +59,63 @@ def create_middle_panel():
     return drp.Panel(
         html.Div(
             [
-                # Toolbar for zoom controls
+                # Toolbar for zoom/graph controls
                 html.Div(
                     [
-                        html.Button(
-                            "Zoom In",
-                            id="zoom-in",
-                            n_clicks=0,
-                            className="beam-button",
-                        ),
-                        html.Button(
-                            "Zoom Out",
-                            id="zoom-out",
-                            n_clicks=0,
-                            className="beam-button",
-                        ),
-                        html.Button(
-                            "Reset View",
-                            id="reset-view",
-                            n_clicks=0,
-                            className="beam-button",
-                        ),
-                        html.Button(
-                            "Delete Selected",
-                            id="delete-selected",
-                            n_clicks=0,
-                            className="beam-button",
-                            disabled=True,
-                        ),
-                        html.Button(
-                            "Add Node",
-                            id="add-node-button",
-                            className="beam-button",
-                        ),
-                        html.Button(
-                            "Add Edge",
-                            id="add-edge-button",
-                            n_clicks=0,
-                            className="beam-button",
-                            disabled=True,
-                        ),
+                        html.Div(
+                            [
+                                html.Button(
+                                    "Add Node",
+                                    id="add-node-button",
+                                    className="beam-button",
+                                ),
+                                html.Button(
+                                    "Add Edge",
+                                    id="add-edge-button",
+                                    n_clicks=0,
+                                    className="beam-button",
+                                    disabled=True,
+                                ),
+                                html.Button(
+                                    "Delete Selected",
+                                    id="delete-selected",
+                                    n_clicks=0,
+                                    className="beam-button",
+                                    disabled=True,
+                                ),
+                            ],
+                            style={"float": "left"},
+                        ),  # Added float left to put other buttons to the left
+                        html.Div(
+                            [
+                                html.Button(
+                                    "Zoom In",
+                                    id="zoom-in",
+                                    n_clicks=0,
+                                    className="beam-button",
+                                ),
+                                html.Button(
+                                    "Zoom Out",
+                                    id="zoom-out",
+                                    n_clicks=0,
+                                    className="beam-button",
+                                ),
+                                html.Button(
+                                    "Reset View",
+                                    id="reset-view",
+                                    n_clicks=0,
+                                    className="beam-button",
+                                ),
+                            ],
+                            style={"float": "right"},
+                        ),  # Added float right to put zoom buttons to the right
                     ],
-                    style={"margin-bottom": "10px", "position": "relative", "zIndex": 10},
+                    style={
+                        "margin-bottom": "10px",
+                        "display": "flex",
+                        "justifyContent": "space-between",
+                        "width": "100%",
+                    },
                 ),
                 html.Div(
                     [
