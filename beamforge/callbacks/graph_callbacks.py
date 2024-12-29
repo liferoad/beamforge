@@ -143,18 +143,30 @@ def register_graph_callbacks(app):
 
     @app.callback(
         Output("network-graph", "elements"),
+        Output("graph-log", "value", allow_duplicate=True),
         Input("delete-selected", "n_clicks"),
         State("network-graph", "elements"),
         State("network-graph", "selectedNodeData"),
         State("network-graph", "selectedEdgeData"),
+        State("graph-log", "value"),
         prevent_initial_call=True,
     )
-    def remove_selected_elements(n_clicks, elements, selected_nodes, selected_edges):
+    def remove_selected_elements(n_clicks, elements, selected_nodes, selected_edges, log_message):
         if n_clicks > 0:
             node_ids_to_remove = {node["id"] for node in selected_nodes} if selected_nodes else set()
             edge_ids_to_remove = (
                 {(edge["source"], edge["target"]) for edge in selected_edges} if selected_edges else set()
             )
+
+            deleted_nodes = [node["id"] for node in selected_nodes] if selected_nodes else []
+            deleted_edges = (
+                [f"({edge['source']}, {edge['target']})" for edge in selected_edges] if selected_edges else []
+            )
+
+            if deleted_nodes:
+                log_message += f"Deleted nodes: {', '.join(deleted_nodes)}\n"
+            if deleted_edges:
+                log_message += f"Deleted edges: {', '.join(deleted_edges)}\n"
 
             new_elements = []
             for element in elements:
@@ -167,5 +179,5 @@ def register_graph_callbacks(app):
                 elif "id" in element["data"]:  # It's a node
                     if element["data"]["id"] not in node_ids_to_remove:
                         new_elements.append(element)
-            return new_elements
-        return elements
+            return new_elements, log_message
+        return elements, log_message
