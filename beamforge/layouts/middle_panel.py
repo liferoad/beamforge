@@ -80,6 +80,13 @@ def create_middle_panel():
                             n_clicks=0,
                             className="beam-button",
                         ),
+                        html.Button(
+                            "Delete Selected",
+                            id="delete-selected",
+                            n_clicks=0,
+                            className="beam-button",
+                            disabled=True,
+                        ),
                     ],
                     style={"margin-bottom": "10px", "position": "relative", "zIndex": 10},
                 ),
@@ -99,8 +106,6 @@ def create_middle_panel():
                                 "width": "100%",
                                 "height": "calc(80vh - 120px)",
                                 "overflow": "auto",
-                                # "position": "absolute",
-                                # "border": "1px solid #FFA500",
                                 "borderRadius": "4px",
                                 "backgroundColor": "#F5F5F5",
                             },
@@ -116,7 +121,7 @@ def create_middle_panel():
                         dcc.Textarea(
                             id="graph-log",
                             value="",
-                            readOnly=True,  # Prevent direct user editing
+                            readOnly=True,
                             style={
                                 "width": "100%",
                                 "height": "200px",

@@ -68,9 +68,7 @@ def register_graph_callbacks(app):
                         [
                             html.H4(
                                 f"Transform: {node_data['id']}",
-                                style={
-                                    "color": "#FF6F20",
-                                },
+                                style={"color": "#FF6F20"},
                             ),
                             html.H5(f"Type: {node_data['type']}"),
                             html.H5("Configuration:"),
@@ -134,3 +132,40 @@ def register_graph_callbacks(app):
             log_message += f"Edge tapped: {tapEdge['data']['id']}\n"
         # Add other log messages based on graph interactions
         return log_message
+
+    @app.callback(
+        Output("delete-selected", "disabled"),
+        Input("network-graph", "selectedNodeData"),
+        Input("network-graph", "selectedEdgeData"),
+    )
+    def enable_delete_button(selected_nodes, selected_edges):
+        return not (selected_nodes or selected_edges)
+
+    @app.callback(
+        Output("network-graph", "elements"),
+        Input("delete-selected", "n_clicks"),
+        State("network-graph", "elements"),
+        State("network-graph", "selectedNodeData"),
+        State("network-graph", "selectedEdgeData"),
+        prevent_initial_call=True,
+    )
+    def remove_selected_elements(n_clicks, elements, selected_nodes, selected_edges):
+        if n_clicks > 0:
+            node_ids_to_remove = {node["id"] for node in selected_nodes} if selected_nodes else set()
+            edge_ids_to_remove = (
+                {(edge["source"], edge["target"]) for edge in selected_edges} if selected_edges else set()
+            )
+
+            new_elements = []
+            for element in elements:
+                if "source" in element["data"]:  # It's an edge
+                    if (element["data"]["source"], element["data"]["target"]) not in edge_ids_to_remove and (
+                        element["data"]["target"],
+                        element["data"]["source"],
+                    ) not in edge_ids_to_remove:
+                        new_elements.append(element)
+                elif "id" in element["data"]:  # It's a node
+                    if element["data"]["id"] not in node_ids_to_remove:
+                        new_elements.append(element)
+            return new_elements
+        return elements
