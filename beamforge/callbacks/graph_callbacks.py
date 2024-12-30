@@ -6,7 +6,7 @@ import json
 # third party libraries
 import dash
 import dash_bootstrap_components as dbc
-from dash import Input, Output, State, html
+from dash import Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 from utils.yaml_parser import parse_beam_yaml
 
@@ -70,7 +70,60 @@ def register_graph_callbacks(app):
                                 f"Transform: {node_data['id']}",
                                 style={"color": "#FF6F20"},
                             ),
-                            html.H5(f"Type: {node_data['type']}"),
+                            dcc.Dropdown(
+                                id="node-type-dropdown",
+                                options=[
+                                    {"label": "AssertEqual", "value": "AssertEqual"},
+                                    {"label": "AssignTimestamps", "value": "AssignTimestamps"},
+                                    {"label": "Combine", "value": "Combine"},
+                                    {"label": "Create", "value": "Create"},
+                                    {"label": "Enrichment", "value": "Enrichment"},
+                                    {"label": "Explode", "value": "Explode"},
+                                    {"label": "Filter", "value": "Filter"},
+                                    {"label": "Flatten", "value": "Flatten"},
+                                    {"label": "Join", "value": "Join"},
+                                    {"label": "LogForTesting", "value": "LogForTesting"},
+                                    {"label": "MLTransform", "value": "MLTransform"},
+                                    {"label": "MapToFields", "value": "MapToFields"},
+                                    {"label": "Partition", "value": "Partition"},
+                                    {"label": "PyTransform", "value": "PyTransform"},
+                                    {"label": "Sql", "value": "Sql"},
+                                    {"label": "StripErrorMetadata", "value": "StripErrorMetadata"},
+                                    {"label": "ValidateWithSchema", "value": "ValidateWithSchema"},
+                                    {"label": "WindowInto", "value": "WindowInto"},
+                                    {"label": "ReadFromAvro", "value": "ReadFromAvro"},
+                                    {"label": "WriteToAvro", "value": "WriteToAvro"},
+                                    {"label": "ReadFromBigQuery", "value": "ReadFromBigQuery"},
+                                    {"label": "WriteToBigQuery", "value": "WriteToBigQuery"},
+                                    {"label": "ReadFromCsv", "value": "ReadFromCsv"},
+                                    {"label": "WriteToCsv", "value": "WriteToCsv"},
+                                    {"label": "ReadFromJdbc", "value": "ReadFromJdbc"},
+                                    {"label": "WriteToJdbc", "value": "WriteToJdbc"},
+                                    {"label": "ReadFromJson", "value": "ReadFromJson"},
+                                    {"label": "WriteToJson", "value": "WriteToJson"},
+                                    {"label": "ReadFromKafka", "value": "ReadFromKafka"},
+                                    {"label": "WriteToKafka", "value": "WriteToKafka"},
+                                    {"label": "ReadFromMySql", "value": "ReadFromMySql"},
+                                    {"label": "WriteToMySql", "value": "WriteToMySql"},
+                                    {"label": "ReadFromOracle", "value": "ReadFromOracle"},
+                                    {"label": "WriteToOracle", "value": "WriteToOracle"},
+                                    {"label": "ReadFromParquet", "value": "ReadFromParquet"},
+                                    {"label": "WriteToParquet", "value": "WriteToParquet"},
+                                    {"label": "ReadFromPostgres", "value": "ReadFromPostgres"},
+                                    {"label": "WriteToPostgres", "value": "WriteToPostgres"},
+                                    {"label": "ReadFromPubSub", "value": "ReadFromPubSub"},
+                                    {"label": "WriteToPubSub", "value": "WriteToPubSub"},
+                                    {"label": "ReadFromPubSubLite", "value": "ReadFromPubSubLite"},
+                                    {"label": "WriteToPubSubLite", "value": "WriteToPubSubLite"},
+                                    {"label": "ReadFromSpanner", "value": "ReadFromSpanner"},
+                                    {"label": "WriteToSpanner", "value": "WriteToSpanner"},
+                                    {"label": "ReadFromSqlServer", "value": "ReadFromSqlServer"},
+                                    {"label": "WriteToSqlServer", "value": "WriteToSqlServer"},
+                                    {"label": "ReadFromText", "value": "ReadFromText"},
+                                    {"label": "WriteToText", "value": "WriteToText"},
+                                ],
+                                value=node_data["type"],
+                            ),
                             html.H5("Configuration:"),
                             DashAceEditor(
                                 id="node-config-editor",
@@ -84,7 +137,7 @@ def register_graph_callbacks(app):
                 ],
                 style={"backgroundColor": "#F5F5F5", "border": "1px solid #dee2e6"},
                 className="shadow-sm",
-            )  # Light background with border
+            )
         ]
 
         return html.Div(details)
