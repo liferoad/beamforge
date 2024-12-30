@@ -3,6 +3,7 @@ import dash
 import dash_cytoscape as cyto
 
 from beamforge.callbacks.graph_callbacks import register_graph_callbacks
+from beamforge.callbacks.node_callbacks import register_node_callbacks
 from beamforge.callbacks.yaml_callbacks import register_yaml_callbacks
 from beamforge.layouts.main_layout import create_layout
 
@@ -17,6 +18,7 @@ app.layout = create_layout()
 
 # Register callbacks
 register_graph_callbacks(app)
+register_node_callbacks(app)
 register_yaml_callbacks(app)
 
 if __name__ == "__main__":
