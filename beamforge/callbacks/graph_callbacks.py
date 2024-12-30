@@ -4,6 +4,7 @@ import io
 
 # third party libraries
 import dash
+import yaml
 from dash import Input, Output, State
 from utils.yaml_parser import parse_beam_yaml
 
@@ -11,13 +12,14 @@ from utils.yaml_parser import parse_beam_yaml
 def register_graph_callbacks(app):
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
+        Output("yaml-content", "value", allow_duplicate=True),
         Input("upload-data", "contents"),
         State("upload-data", "filename"),
         prevent_initial_call=True,
     )
     def update_graph(contents, filename):
         if contents is None:
-            return []
+            return [], ""
 
         content_type, content_string = contents.split(",")
         decoded = base64.b64decode(content_string)
@@ -47,10 +49,10 @@ def register_graph_callbacks(app):
             for edge in G.edges():
                 elements.append({"data": {"source": edge[0], "target": edge[1]}})
 
-            return elements
+            return elements, decoded.decode("utf-8")
         except Exception as e:
             print(e)
-            return []
+            return [], ""
 
     @app.callback(
         Output("network-graph", "zoom"),
@@ -105,8 +107,9 @@ def register_graph_callbacks(app):
         return not (selected_nodes or selected_edges)
 
     @app.callback(
-        Output("network-graph", "elements"),
+        Output("network-graph", "elements", allow_duplicate=True),
         Output("graph-log", "value", allow_duplicate=True),
+        Output("yaml-content", "value", allow_duplicate=True),
         Input("delete-selected", "n_clicks"),
         State("network-graph", "elements"),
         State("network-graph", "selectedNodeData"),
@@ -142,12 +145,29 @@ def register_graph_callbacks(app):
                 elif "id" in element["data"]:  # It's a node
                     if element["data"]["id"] not in node_ids_to_remove:
                         new_elements.append(element)
-            return new_elements, log_message
-        return new_elements, log_message
+
+            # Generate YAML content
+            yaml_data = {"nodes": [], "edges": []}
+            for elem in new_elements:
+                if "source" in elem["data"]:
+                    yaml_data["edges"].append({"source": elem["data"]["source"], "target": elem["data"]["target"]})
+                else:
+                    yaml_data["nodes"].append(
+                        {
+                            "id": elem["data"]["id"],
+                            "type": elem["data"].get("type", "Unknown"),
+                            "config": elem["data"].get("config", {}),
+                        }
+                    )
+            yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
+
+            return new_elements, log_message, yaml_string
+        return elements, log_message, dash.no_update
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("graph-log", "value", allow_duplicate=True),
+        Output("yaml-content", "value", allow_duplicate=True),
         Input("add-node-button", "n_clicks"),
         State("network-graph", "elements"),
         State("graph-log", "value"),
@@ -158,7 +178,24 @@ def register_graph_callbacks(app):
             new_node_id = f"node-{len([el for el in elements if 'source' not in el['data']]) + 1}"
             elements = elements + [{"data": {"id": new_node_id, "type": "UNKNOWN", "config": {}}}]
             log_message += f"Added node: {new_node_id}\n"
-        return elements, log_message
+
+            # Generate YAML content
+            yaml_data = {"nodes": [], "edges": []}
+            for elem in elements:
+                if "source" in elem["data"]:
+                    yaml_data["edges"].append({"source": elem["data"]["source"], "target": elem["data"]["target"]})
+                else:
+                    yaml_data["nodes"].append(
+                        {
+                            "id": elem["data"]["id"],
+                            "type": elem["data"].get("type", "Unknown"),
+                            "config": elem["data"].get("config", {}),
+                        }
+                    )
+            yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
+
+            return elements, log_message, yaml_string
+        return elements, log_message, dash.no_update
 
     @app.callback(
         Output("add-edge-button", "disabled"),
@@ -170,6 +207,7 @@ def register_graph_callbacks(app):
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("graph-log", "value", allow_duplicate=True),
+        Output("yaml-content", "value", allow_duplicate=True),
         Input("add-edge-button", "n_clicks"),
         State("network-graph", "elements"),
         State("network-graph", "selectedNodeData"),
@@ -196,4 +234,20 @@ def register_graph_callbacks(app):
             else:
                 log_message += f"Edge already exists between {source_id} and {target_id}\n"
 
-        return elements, log_message
+            # Generate YAML content
+            yaml_data = {"nodes": [], "edges": []}
+            for elem in elements:
+                if "source" in elem["data"]:
+                    yaml_data["edges"].append({"source": elem["data"]["source"], "target": elem["data"]["target"]})
+                else:
+                    yaml_data["nodes"].append(
+                        {
+                            "id": elem["data"]["id"],
+                            "type": elem["data"].get("type", "Unknown"),
+                            "config": elem["data"].get("config", {}),
+                        }
+                    )
+            yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
+
+            return elements, log_message, yaml_string
+        return elements, log_message, dash.no_update
