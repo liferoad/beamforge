@@ -4,8 +4,8 @@ import io
 
 # third party libraries
 import dash
-import yaml
 from dash import Input, Output, State
+from utils.graph_utils import generate_yaml_content
 from utils.yaml_parser import parse_beam_yaml
 
 
@@ -147,19 +147,7 @@ def register_graph_callbacks(app):
                         new_elements.append(element)
 
             # Generate YAML content
-            yaml_data = {"nodes": [], "edges": []}
-            for elem in new_elements:
-                if "source" in elem["data"]:
-                    yaml_data["edges"].append({"source": elem["data"]["source"], "target": elem["data"]["target"]})
-                else:
-                    yaml_data["nodes"].append(
-                        {
-                            "id": elem["data"]["id"],
-                            "type": elem["data"].get("type", "Unknown"),
-                            "config": elem["data"].get("config", {}),
-                        }
-                    )
-            yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
+            yaml_string = generate_yaml_content(new_elements)
 
             return new_elements, log_message, yaml_string
         return elements, log_message, dash.no_update
@@ -180,19 +168,7 @@ def register_graph_callbacks(app):
             log_message += f"Added node: {new_node_id}\n"
 
             # Generate YAML content
-            yaml_data = {"nodes": [], "edges": []}
-            for elem in elements:
-                if "source" in elem["data"]:
-                    yaml_data["edges"].append({"source": elem["data"]["source"], "target": elem["data"]["target"]})
-                else:
-                    yaml_data["nodes"].append(
-                        {
-                            "id": elem["data"]["id"],
-                            "type": elem["data"].get("type", "Unknown"),
-                            "config": elem["data"].get("config", {}),
-                        }
-                    )
-            yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
+            yaml_string = generate_yaml_content(elements)
 
             return elements, log_message, yaml_string
         return elements, log_message, dash.no_update
@@ -235,19 +211,7 @@ def register_graph_callbacks(app):
                 log_message += f"Edge already exists between {source_id} and {target_id}\n"
 
             # Generate YAML content
-            yaml_data = {"nodes": [], "edges": []}
-            for elem in elements:
-                if "source" in elem["data"]:
-                    yaml_data["edges"].append({"source": elem["data"]["source"], "target": elem["data"]["target"]})
-                else:
-                    yaml_data["nodes"].append(
-                        {
-                            "id": elem["data"]["id"],
-                            "type": elem["data"].get("type", "Unknown"),
-                            "config": elem["data"].get("config", {}),
-                        }
-                    )
-            yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
+            yaml_string = generate_yaml_content(elements)
 
             return elements, log_message, yaml_string
         return elements, log_message, dash.no_update
