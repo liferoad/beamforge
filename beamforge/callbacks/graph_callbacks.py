@@ -73,11 +73,11 @@ def register_graph_callbacks(app):
                             html.H5(f"Type: {node_data['type']}"),
                             html.H5("Configuration:"),
                             DashAceEditor(
-                                value=json.dumps(node_data["config"], indent=4),
+                                id="node-config-editor",
+                                value=json.dumps(node_data["config"], indent=2),
                                 style={"width": "100%", "height": "200px"},
                                 theme="tomorrow",
                                 mode="json",
-                                readOnly=True,
                             ),
                         ]
                     ),
@@ -88,6 +88,28 @@ def register_graph_callbacks(app):
         ]
 
         return html.Div(details)
+
+    @app.callback(
+        Output("network-graph", "elements", allow_duplicate=True),
+        Input("node-config-editor", "value"),
+        State("network-graph", "tapNodeData"),
+        State("network-graph", "elements"),
+        prevent_initial_call=True,
+    )
+    def save_node_config(config_value, node_data, elements):
+        if node_data:
+            try:
+                new_config = json.loads(config_value)
+                node_id = node_data["id"]
+                updated_elements = []
+                for element in elements:
+                    if element.get("data") and element["data"].get("id") == node_id:
+                        element["data"]["config"] = new_config
+                    updated_elements.append(element)
+                return updated_elements
+            except json.JSONDecodeError:
+                return dash.no_update
+        return dash.no_update
 
     @app.callback(
         Output("network-graph", "zoom"),
