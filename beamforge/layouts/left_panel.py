@@ -86,18 +86,9 @@ def create_left_panel():
                     style={"height": "calc(100% - 250px)", "overflow": "auto"},
                 ),
                 html.Button(
-                    "Create YAML File",
+                    "Download YAML File",
                     id="create-yaml-button",
-                    style={
-                        "width": "95%",
-                        "margin": "10px",
-                        "padding": "10px",
-                        "backgroundColor": "#007bff",
-                        "color": "white",
-                        "border": "none",
-                        "borderRadius": "5px",
-                        "cursor": "pointer",
-                    },
+                    className="beam-button",
                 ),
                 dcc.Download(id="download-yaml"),
                 # Move the Beam logo to the bottom

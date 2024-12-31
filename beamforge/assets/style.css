@@ -31,3 +31,7 @@
 .beam-button:hover {
     background-color:  #f1a009; /* color for hover effect */
 }
+.beam-button:disabled {
+    background-color: gray;
+    color: white;
+  }
