@@ -127,6 +127,26 @@ def register_node_callbacks(app):
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
+        Output("yaml-content", "value", allow_duplicate=True),
+        Input("node-type-dropdown", "value"),
+        State("network-graph", "tapNodeData"),
+        State("network-graph", "elements"),
+        prevent_initial_call=True,
+    )
+    def update_node_type(new_type, node_data, elements):
+        if node_data:
+            node_id = node_data["id"]
+            updated_elements = []
+            for element in elements:
+                if element.get("data") and element["data"].get("id") == node_id:
+                    element["data"]["type"] = new_type
+                updated_elements.append(element)
+            yaml_content = generate_yaml_content(updated_elements)
+            return updated_elements, yaml_content
+        return dash.no_update, dash.no_update
+
+    @app.callback(
+        Output("network-graph", "elements", allow_duplicate=True),
         Output("network-graph", "tapNodeData", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Input("node-id-input", "value"),
