@@ -15,7 +15,7 @@ def create_left_panel():
             },
             children=[
                 html.H3(
-                    "BeamForge",
+                    "BeamForge v0.0.1",
                     style={
                         "fontSize": "28px",
                         "fontWeight": "bold",

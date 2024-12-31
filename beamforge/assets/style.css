@@ -1,13 +1,14 @@
 .panel-resize-handle {
-    background-color: #FF6F20;
-    width: 2px;
+    background-color: #ccc;
+    width: 1px;
     transition: background-color 0.2s;
 }
 
 .panel-resize-handle:hover {
-    background-color: #f1a009;
-    width: 4px;
+    background-color: #999;
+    width: 2px;
 }
+tempHeader
 
 .panel-group {
     width: 100%;
@@ -15,8 +16,8 @@
 }
 
 .panel {
-    background-color: white;
-    padding: 16px;
+    background-color: #f8f8f8; /* Light gray */
+    padding: 0px;
 }
 
 .beam-button {
@@ -25,11 +26,11 @@
     background-color: #FF6F20;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 15px;
 }
 
 .beam-button:hover {
-    background-color:  #f1a009; /* color for hover effect */
+    background-color: #f7a75b; /* Slightly lighter orange */
 }
 .beam-button:disabled {
     background-color: gray;
