@@ -69,48 +69,45 @@ def register_node_callbacks(app):
 
         # Create a formatted display of node data using dbc.Card with a custom background color
         details = [
-            html.Div(
+            dbc.Row(
                 [
-                    dbc.Row(
-                        [
-                            dbc.Col(html.H5("Name:")),
-                            dbc.Col(
-                                dcc.Input(
-                                    id="node-id-input",
-                                    value=node_data["id"],
-                                    type="text",
-                                ),
-                                width=4,
-                            ),
-                        ],
-                        className="mb-2",
-                    ),
-                    dbc.Row(
-                        [
-                            dbc.Col(html.H5("Type:")),
-                            dbc.Col(
-                                dcc.Dropdown(
-                                    id="node-type-dropdown",
-                                    options=get_node_type_options(),
-                                    value=node_data["type"],
-                                ),
-                                width=4,
-                            ),
-                        ],
-                        className="mb-2",
-                    ),
-                    html.H5("Configuration:"),
-                    DashAceEditor(
-                        id="node-config-editor",
-                        value=yaml.dump(node_data["config"], indent=2),
-                        style={"width": "100%"},
-                        theme="tomorrow",
-                        mode="yaml",
+                    dbc.Col(html.H5("Name:")),
+                    dbc.Col(
+                        dcc.Input(
+                            id="node-id-input",
+                            value=node_data["id"],
+                            type="text",
+                            style={
+                                "width": "80%",
+                            },
+                        ),
                     ),
                 ],
-                style={"backgroundColor": "#F5F5F5", "border": "1px solid #dee2e6"},
-                className="shadow-sm",
-            )
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(html.H5("Type:")),
+                    dbc.Col(
+                        dcc.Dropdown(
+                            id="node-type-dropdown",
+                            options=get_node_type_options(),
+                            value=node_data["type"],
+                            style={
+                                "width": "80%",
+                            },
+                        ),
+                    ),
+                ],
+                className="mb-2",
+            ),
+            html.H5("Configuration:"),
+            DashAceEditor(
+                id="node-config-editor",
+                value=yaml.dump(node_data["config"], indent=2),
+                style={"width": "100%"},
+                theme="tomorrow",
+                mode="yaml",
+            ),
         ]
 
         return html.Div(details)
