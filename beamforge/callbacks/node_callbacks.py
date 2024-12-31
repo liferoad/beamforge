@@ -10,6 +10,59 @@ from dash_ace import DashAceEditor
 from beamforge.utils.graph_utils import generate_yaml_content
 
 
+def get_node_type_options():
+    return [
+        {"label": "AssertEqual", "value": "AssertEqual"},
+        {"label": "AssignTimestamps", "value": "AssignTimestamps"},
+        {"label": "Combine", "value": "Combine"},
+        {"label": "Create", "value": "Create"},
+        {"label": "Enrichment", "value": "Enrichment"},
+        {"label": "Explode", "value": "Explode"},
+        {"label": "Filter", "value": "Filter"},
+        {"label": "Flatten", "value": "Flatten"},
+        {"label": "Join", "value": "Join"},
+        {"label": "LogForTesting", "value": "LogForTesting"},
+        {"label": "MLTransform", "value": "MLTransform"},
+        {"label": "MapToFields", "value": "MapToFields"},
+        {"label": "Partition", "value": "Partition"},
+        {"label": "PyTransform", "value": "PyTransform"},
+        {"label": "Sql", "value": "Sql"},
+        {"label": "StripErrorMetadata", "value": "StripErrorMetadata"},
+        {"label": "ValidateWithSchema", "value": "ValidateWithSchema"},
+        {"label": "WindowInto", "value": "WindowInto"},
+        {"label": "ReadFromAvro", "value": "ReadFromAvro"},
+        {"label": "WriteToAvro", "value": "WriteToAvro"},
+        {"label": "ReadFromBigQuery", "value": "ReadFromBigQuery"},
+        {"label": "WriteToBigQuery", "value": "WriteToBigQuery"},
+        {"label": "ReadFromCsv", "value": "ReadFromCsv"},
+        {"label": "WriteToCsv", "value": "WriteToCsv"},
+        {"label": "ReadFromJdbc", "value": "ReadFromJdbc"},
+        {"label": "WriteToJdbc", "value": "WriteToJdbc"},
+        {"label": "ReadFromJson", "value": "ReadFromJson"},
+        {"label": "WriteToJson", "value": "WriteToJson"},
+        {"label": "ReadFromKafka", "value": "ReadFromKafka"},
+        {"label": "WriteToKafka", "value": "WriteToKafka"},
+        {"label": "ReadFromMySql", "value": "ReadFromMySql"},
+        {"label": "WriteToMySql", "value": "WriteToMySql"},
+        {"label": "ReadFromOracle", "value": "ReadFromOracle"},
+        {"label": "WriteToOracle", "value": "WriteToOracle"},
+        {"label": "ReadFromParquet", "value": "ReadFromParquet"},
+        {"label": "WriteToParquet", "value": "WriteToParquet"},
+        {"label": "ReadFromPostgres", "value": "ReadFromPostgres"},
+        {"label": "WriteToPostgres", "value": "WriteToPostgres"},
+        {"label": "ReadFromPubSub", "value": "ReadFromPubSub"},
+        {"label": "WriteToPubSub", "value": "WriteToPubSub"},
+        {"label": "ReadFromPubSubLite", "value": "ReadFromPubSubLite"},
+        {"label": "WriteToPubSubLite", "value": "WriteToPubSubLite"},
+        {"label": "ReadFromSpanner", "value": "ReadFromSpanner"},
+        {"label": "WriteToSpanner", "value": "WriteToSpanner"},
+        {"label": "ReadFromSqlServer", "value": "ReadFromSqlServer"},
+        {"label": "WriteToSqlServer", "value": "WriteToSqlServer"},
+        {"label": "ReadFromText", "value": "ReadFromText"},
+        {"label": "WriteToText", "value": "WriteToText"},
+    ]
+
+
 def register_node_callbacks(app):
     @app.callback(Output("node-data", "children"), Input("network-graph", "tapNodeData"))
     def display_node_data(node_data):
@@ -18,80 +71,43 @@ def register_node_callbacks(app):
 
         # Create a formatted display of node data using dbc.Card with a custom background color
         details = [
-            dbc.Card(
+            html.Div(
                 [
-                    dbc.CardBody(
+                    dbc.Row(
                         [
-                            html.H5("Name:"),
-                            dcc.Input(
-                                id="node-id-input",
-                                value=node_data["id"],
-                                type="text",
+                            dbc.Col(html.H5("Name:")),
+                            dbc.Col(
+                                dcc.Input(
+                                    id="node-id-input",
+                                    value=node_data["id"],
+                                    type="text",
+                                ),
+                                width=4,
                             ),
-                            html.H5("Type:"),
-                            dcc.Dropdown(
-                                id="node-type-dropdown",
-                                options=[
-                                    {"label": "AssertEqual", "value": "AssertEqual"},
-                                    {"label": "AssignTimestamps", "value": "AssignTimestamps"},
-                                    {"label": "Combine", "value": "Combine"},
-                                    {"label": "Create", "value": "Create"},
-                                    {"label": "Enrichment", "value": "Enrichment"},
-                                    {"label": "Explode", "value": "Explode"},
-                                    {"label": "Filter", "value": "Filter"},
-                                    {"label": "Flatten", "value": "Flatten"},
-                                    {"label": "Join", "value": "Join"},
-                                    {"label": "LogForTesting", "value": "LogForTesting"},
-                                    {"label": "MLTransform", "value": "MLTransform"},
-                                    {"label": "MapToFields", "value": "MapToFields"},
-                                    {"label": "Partition", "value": "Partition"},
-                                    {"label": "PyTransform", "value": "PyTransform"},
-                                    {"label": "Sql", "value": "Sql"},
-                                    {"label": "StripErrorMetadata", "value": "StripErrorMetadata"},
-                                    {"label": "ValidateWithSchema", "value": "ValidateWithSchema"},
-                                    {"label": "WindowInto", "value": "WindowInto"},
-                                    {"label": "ReadFromAvro", "value": "ReadFromAvro"},
-                                    {"label": "WriteToAvro", "value": "WriteToAvro"},
-                                    {"label": "ReadFromBigQuery", "value": "ReadFromBigQuery"},
-                                    {"label": "WriteToBigQuery", "value": "WriteToBigQuery"},
-                                    {"label": "ReadFromCsv", "value": "ReadFromCsv"},
-                                    {"label": "WriteToCsv", "value": "WriteToCsv"},
-                                    {"label": "ReadFromJdbc", "value": "ReadFromJdbc"},
-                                    {"label": "WriteToJdbc", "value": "WriteToJdbc"},
-                                    {"label": "ReadFromJson", "value": "ReadFromJson"},
-                                    {"label": "WriteToJson", "value": "WriteToJson"},
-                                    {"label": "ReadFromKafka", "value": "ReadFromKafka"},
-                                    {"label": "WriteToKafka", "value": "WriteToKafka"},
-                                    {"label": "ReadFromMySql", "value": "ReadFromMySql"},
-                                    {"label": "WriteToMySql", "value": "WriteToMySql"},
-                                    {"label": "ReadFromOracle", "value": "ReadFromOracle"},
-                                    {"label": "WriteToOracle", "value": "WriteToOracle"},
-                                    {"label": "ReadFromParquet", "value": "ReadFromParquet"},
-                                    {"label": "WriteToParquet", "value": "WriteToParquet"},
-                                    {"label": "ReadFromPostgres", "value": "ReadFromPostgres"},
-                                    {"label": "WriteToPostgres", "value": "WriteToPostgres"},
-                                    {"label": "ReadFromPubSub", "value": "ReadFromPubSub"},
-                                    {"label": "WriteToPubSub", "value": "WriteToPubSub"},
-                                    {"label": "ReadFromPubSubLite", "value": "ReadFromPubSubLite"},
-                                    {"label": "WriteToPubSubLite", "value": "WriteToPubSubLite"},
-                                    {"label": "ReadFromSpanner", "value": "ReadFromSpanner"},
-                                    {"label": "WriteToSpanner", "value": "WriteToSpanner"},
-                                    {"label": "ReadFromSqlServer", "value": "ReadFromSqlServer"},
-                                    {"label": "WriteToSqlServer", "value": "WriteToSqlServer"},
-                                    {"label": "ReadFromText", "value": "ReadFromText"},
-                                    {"label": "WriteToText", "value": "WriteToText"},
-                                ],
-                                value=node_data["type"],
+                        ],
+                        className="mb-2",
+                    ),
+                    dbc.Row(
+                        [
+                            dbc.Col(html.H5("Type:")),
+                            dbc.Col(
+                                dcc.Dropdown(
+                                    id="node-type-dropdown",
+                                    options=get_node_type_options(),
+                                    value=node_data["type"],
+                                ),
+                                width=4,
                             ),
-                            html.H5("Configuration:"),
-                            DashAceEditor(
-                                id="node-config-editor",
-                                value=json.dumps(node_data["config"], indent=2),
-                                style={"width": "100%", "height": "200px"},
-                                theme="tomorrow",
-                                mode="json",
-                            ),
-                        ]
+                        ],
+                        className="mb-2",
+                    ),
+                    html.H5("Configuration:"),
+                    DashAceEditor(
+                        id="node-config-editor",
+                        value=json.dumps(node_data["config"], indent=2),
+                        style={"width": "100%"},
+                        theme="tomorrow",
+                        mode="json",
                     ),
                 ],
                 style={"backgroundColor": "#F5F5F5", "border": "1px solid #dee2e6"},
