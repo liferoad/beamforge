@@ -33,16 +33,13 @@ def create_left_panel():
                     id="upload-data",
                     children=html.Div(
                         [
-                            html.I(className="fas fa-file-upload", style={"fontSize": "32px", "marginBottom": "10px"}),
-                            html.Div("Drag and Drop", style={"fontSize": "18px", "fontWeight": "bold"}),
-                            html.Div("or", style={"margin": "8px 0"}),
-                            html.A("Select Beam YAML File", style={"color": "#FF6F20", "textDecoration": "underline"}),
+                            html.A("Select Beam YAML File", style={"color": "#FF6F20", "fontWeight": "bold"}),
                         ],
                         style={"display": "flex", "flexDirection": "column", "alignItems": "center"},
                     ),
                     style={
                         "width": "90%",
-                        "height": "200px",
+                        "height": "60px",
                         "borderWidth": "2px",
                         "borderStyle": "dashed",
                         "borderColor": "#FF6F20",
@@ -78,12 +75,12 @@ def create_left_panel():
                             readOnly=True,
                             style={
                                 "width": "95%",
-                                "height": "calc(100vh - 300px)",
+                                "height": "calc(100vh - 220px)",
                                 "margin": "10px",
                             },
                         ),
                     ],
-                    style={"height": "calc(100% - 250px)", "overflow": "auto"},
+                    style={"height": "calc(100% - 170px)", "overflow": "auto"},
                 ),
                 html.Button(
                     "Download YAML File",
@@ -102,7 +99,7 @@ def create_left_panel():
                         html.Img(
                             src="/assets/beam_logo.png",  # Ensure the logo is in the assets folder
                             style={
-                                "width": "100px",  # Adjust size as needed
+                                "width": "80px",  # Adjust size as needed
                                 "display": "block",
                             },
                         ),
