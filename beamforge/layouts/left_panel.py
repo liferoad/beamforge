@@ -104,12 +104,19 @@ def create_left_panel():
                         "marginTop": "auto",
                     },  # Center the logo and push it to the bottom
                     children=[
-                        html.Img(
-                            src="/assets/beam_logo.png",  # Ensure the logo is in the assets folder
-                            style={
-                                "width": "80px",  # Adjust size as needed
-                                "display": "block",
-                            },
+                        html.A(
+                            href="https://beam.apache.org/",
+                            target="_blank",
+                            children=[
+                                html.Img(
+                                    src="/assets/beam_logo.png",  # Ensure the logo is in the assets folder
+                                    style={
+                                        "width": "80px",  # Adjust size as needed
+                                        "display": "block",
+                                        "cursor": "pointer",  # Indicate it's clickable
+                                    },
+                                ),
+                            ],
                         ),
                     ],
                 ),
