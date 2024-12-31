@@ -5,6 +5,8 @@ import base64
 import yaml
 from dash import Input, Output, State
 
+from beamforge.utils.graph_utils import generate_yaml_content
+
 
 def register_yaml_callbacks(app):
     @app.callback(
@@ -36,18 +38,5 @@ def register_yaml_callbacks(app):
         if n_clicks is None or not elements:
             return None
 
-        yaml_data = {"nodes": [], "edges": []}
-        for element in elements:
-            if "source" in element["data"]:
-                yaml_data["edges"].append({"source": element["data"]["source"], "target": element["data"]["target"]})
-            else:
-                yaml_data["nodes"].append(
-                    {
-                        "id": element["data"]["id"],
-                        "type": element["data"].get("type", "Unknown"),
-                        "config": element["data"].get("config", {}),
-                    }
-                )
-
-        yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
+        yaml_string = generate_yaml_content(elements)
         return dict(content=yaml_string, filename="beam_graph.yaml")

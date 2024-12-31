@@ -82,12 +82,20 @@ def create_left_panel():
                     ],
                     style={"height": "calc(100% - 170px)", "overflow": "auto"},
                 ),
-                html.Button(
-                    "Download YAML File",
-                    id="create-yaml-button",
-                    className="beam-button",
+                html.Div(
+                    style={
+                        "textAlign": "center",
+                        "marginTop": "auto",
+                    },  # Center the logo and push it to the bottom
+                    children=[
+                        dcc.Download(id="download-yaml"),
+                        html.Button(
+                            "Download File",
+                            id="create-yaml-button",
+                            className="beam-button",
+                        ),
+                    ],
                 ),
-                dcc.Download(id="download-yaml"),
                 # Move the Beam logo to the bottom
                 html.Div(
                     style={
