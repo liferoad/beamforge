@@ -96,24 +96,44 @@ def create_left_panel():
                         ),
                     ],
                 ),
-                # Move the Beam logo to the bottom
+                # Logos at the bottom
                 html.Div(
                     style={
-                        "textAlign": "center",
+                        "display": "flex",
+                        "flexDirection": "row",
+                        "justifyContent": "center",
+                        "alignItems": "center",
                         "margin": "20px 0",
                         "marginTop": "auto",
-                    },  # Center the logo and push it to the bottom
+                    },
                     children=[
+                        # Beam logo
                         html.A(
                             href="https://beam.apache.org/",
                             target="_blank",
                             children=[
                                 html.Img(
-                                    src="/assets/beam_logo.png",  # Ensure the logo is in the assets folder
+                                    src="/assets/beam_logo.png",
                                     style={
-                                        "width": "80px",  # Adjust size as needed
+                                        "width": "80px",
                                         "display": "block",
-                                        "cursor": "pointer",  # Indicate it's clickable
+                                        "cursor": "pointer",
+                                        "marginRight": "60px",  # Add some spacing between logos
+                                    },
+                                ),
+                            ],
+                        ),
+                        # GitHub logo
+                        html.A(
+                            href="https://github.com/apache/beam",
+                            target="_blank",
+                            children=[
+                                html.Img(
+                                    src="/assets/github-mark.png",
+                                    style={
+                                        "width": "40px",
+                                        "display": "block",
+                                        "cursor": "pointer",
                                     },
                                 ),
                             ],
