@@ -1,9 +1,7 @@
-# standard libraries
-import json
-
 # third party libraries
 import dash
 import dash_bootstrap_components as dbc
+import yaml
 from dash import Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 
@@ -104,10 +102,10 @@ def register_node_callbacks(app):
                     html.H5("Configuration:"),
                     DashAceEditor(
                         id="node-config-editor",
-                        value=json.dumps(node_data["config"], indent=2),
+                        value=yaml.dump(node_data["config"], indent=2),
                         style={"width": "100%"},
                         theme="tomorrow",
-                        mode="json",
+                        mode="yaml",
                     ),
                 ],
                 style={"backgroundColor": "#F5F5F5", "border": "1px solid #dee2e6"},
@@ -128,7 +126,7 @@ def register_node_callbacks(app):
     def save_node_config(config_value, node_data, elements):
         if node_data:
             try:
-                new_config = json.loads(config_value)
+                new_config = yaml.safe_load(config_value)
                 node_id = node_data["id"]
                 updated_elements = []
                 for element in elements:
@@ -137,7 +135,7 @@ def register_node_callbacks(app):
                     updated_elements.append(element)
                 yaml_content = generate_yaml_content(updated_elements)
                 return updated_elements, yaml_content
-            except json.JSONDecodeError:
+            except yaml.YAMLError:
                 return dash.no_update, dash.no_update
         return dash.no_update, dash.no_update
 
