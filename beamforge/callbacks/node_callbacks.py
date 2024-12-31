@@ -7,6 +7,8 @@ import dash_bootstrap_components as dbc
 from dash import Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 
+from beamforge.utils.graph_utils import generate_yaml_content
+
 
 def register_node_callbacks(app):
     @app.callback(Output("node-data", "children"), Input("network-graph", "tapNodeData"))
@@ -101,6 +103,7 @@ def register_node_callbacks(app):
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
+        Output("yaml-content", "value", allow_duplicate=True),
         Input("node-config-editor", "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
@@ -116,14 +119,16 @@ def register_node_callbacks(app):
                     if element.get("data") and element["data"].get("id") == node_id:
                         element["data"]["config"] = new_config
                     updated_elements.append(element)
-                return updated_elements
+                yaml_content = generate_yaml_content(updated_elements)
+                return updated_elements, yaml_content
             except json.JSONDecodeError:
-                return dash.no_update
-        return dash.no_update
+                return dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("network-graph", "tapNodeData", allow_duplicate=True),
+        Output("yaml-content", "value", allow_duplicate=True),
         Input("node-id-input", "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
@@ -144,5 +149,6 @@ def register_node_callbacks(app):
                     element["data"]["target"] = new_node_id
                     element["data"]["id"] = None
                 updated_elements.append(element)
-            return updated_elements, node_data
-        return dash.no_update
+            yaml_content = generate_yaml_content(updated_elements)
+            return updated_elements, node_data, yaml_content
+        return dash.no_update, dash.no_update, dash.no_update
