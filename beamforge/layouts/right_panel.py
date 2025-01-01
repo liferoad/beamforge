@@ -11,8 +11,16 @@ def create_right_panel():
                 html.H3(
                     "Transform Details",
                     style={
-                        "color": "#FF6F20",
+                        "width": "auto",
+                        "textAlign": "center",
+                        "fontSize": "28px",
+                        "fontWeight": "bold",
+                        "color": "#FF6F20",  # Primary orange color from the logo
+                        "margin": "5px 5px",
+                        "padding": "10px",
+                        "paddingBottom": "8px",
                         "fontFamily": "Roboto, sans-serif",
+                        "borderRadius": "5px",
                     },
                 ),
                 html.Div(
