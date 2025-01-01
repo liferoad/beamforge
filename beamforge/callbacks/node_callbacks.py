@@ -5,7 +5,7 @@ import yaml
 from dash import Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 
-from beamforge.utils.graph_utils import generate_yaml_content
+from beamforge.utils.graph_utils import format_log_with_timestamp, generate_yaml_content
 
 
 def get_node_type_options():
@@ -120,12 +120,14 @@ def register_node_callbacks(app):
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
+        Output("graph-log", "children", allow_duplicate=True),
         Input("node-config-editor", "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
+        State("graph-log", "children"),
         prevent_initial_call=True,
     )
-    def save_node_config(config_value, node_data, elements):
+    def save_node_config(config_value, node_data, elements, log_message):
         if node_data:
             try:
                 new_config = yaml.safe_load(config_value)
@@ -136,20 +138,23 @@ def register_node_callbacks(app):
                         element["data"]["config"] = new_config
                     updated_elements.append(element)
                 yaml_content = generate_yaml_content(updated_elements)
-                return updated_elements, yaml_content
+                log_message += f"Updated config for node '{node_data['id']}'\n"
+                return updated_elements, yaml_content, format_log_with_timestamp(log_message)
             except yaml.YAMLError:
-                return dash.no_update, dash.no_update
-        return dash.no_update, dash.no_update
+                return dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
+        Output("graph-log", "children", allow_duplicate=True),
         Input("node-type-dropdown", "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
+        State("graph-log", "children"),
         prevent_initial_call=True,
     )
-    def update_node_type(new_type, node_data, elements):
+    def update_node_type(new_type, node_data, elements, log_message):
         if node_data:
             node_id = node_data["id"]
             updated_elements = []
@@ -158,19 +163,22 @@ def register_node_callbacks(app):
                     element["data"]["type"] = new_type
                 updated_elements.append(element)
             yaml_content = generate_yaml_content(updated_elements)
-            return updated_elements, yaml_content
-        return dash.no_update, dash.no_update
+            log_message += f"Changed type of node '{node_data['id']}' to '{new_type}'"
+            return updated_elements, yaml_content, format_log_with_timestamp(log_message)
+        return dash.no_update, dash.no_update, dash.no_update
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("network-graph", "tapNodeData", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
+        Output("graph-log", "children", allow_duplicate=True),
         Input("node-id-input", "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
+        State("graph-log", "children"),
         prevent_initial_call=True,
     )
-    def update_node_id(new_node_id, node_data, elements):
+    def update_node_id(new_node_id, node_data, elements, log_message):
         if node_data and node_data["id"] != new_node_id:
             old_node_id = node_data["id"]
             updated_elements = []
@@ -186,5 +194,6 @@ def register_node_callbacks(app):
                     element["data"]["id"] = None
                 updated_elements.append(element)
             yaml_content = generate_yaml_content(updated_elements)
-            return updated_elements, node_data, yaml_content
-        return dash.no_update, dash.no_update, dash.no_update
+            log_message += f"Renamed node from '{node_data['id']}' to '{new_node_id}'\n"
+            return updated_elements, node_data, yaml_content, format_log_with_timestamp(log_message)
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update

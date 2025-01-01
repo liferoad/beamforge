@@ -91,10 +91,10 @@ def register_graph_callbacks(app):
         # Add other inputs as needed for more interactions
     )
     def update_log(tapNode, tapEdge, log_message):
-        if tapEdge:
-            log_message += "Edge tapped: %s -> %s\n" % (tapEdge["data"]["source"], tapEdge["data"]["target"])
-        elif tapNode:
-            log_message += "Node tapped: %s\n" % tapNode["data"]["id"]
+        # if tapEdge:
+        #     log_message += "Edge tapped: %s -> %s\n" % (tapEdge["data"]["source"], tapEdge["data"]["target"])
+        # elif tapNode:
+        #     log_message += "Node tapped: %s\n" % tapNode["data"]["id"]
 
         return format_log_with_timestamp(log_message)
 
