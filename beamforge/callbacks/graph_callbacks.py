@@ -84,10 +84,10 @@ def register_graph_callbacks(app):
         return zoom_level
 
     @app.callback(
-        Output("graph-log", "value"),
+        Output("graph-log", "children"),
         Input("network-graph", "tapNode"),
         Input("network-graph", "tapEdge"),
-        Input("graph-log", "value"),
+        Input("graph-log", "children"),
         # Add other inputs as needed for more interactions
     )
     def update_log(tapNode, tapEdge, log_message):
@@ -108,13 +108,13 @@ def register_graph_callbacks(app):
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
-        Output("graph-log", "value", allow_duplicate=True),
+        Output("graph-log", "children", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Input("delete-selected", "n_clicks"),
         State("network-graph", "elements"),
         State("network-graph", "selectedNodeData"),
         State("network-graph", "selectedEdgeData"),
-        State("graph-log", "value"),
+        State("graph-log", "children"),
         prevent_initial_call=True,
     )
     def remove_selected_elements(n_clicks, elements, selected_nodes, selected_edges, log_message):
@@ -154,11 +154,11 @@ def register_graph_callbacks(app):
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
-        Output("graph-log", "value", allow_duplicate=True),
+        Output("graph-log", "children", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Input("add-node-button", "n_clicks"),
         State("network-graph", "elements"),
-        State("graph-log", "value"),
+        State("graph-log", "children"),
         prevent_initial_call=True,
     )
     def add_new_node(n_clicks, elements, log_message):
@@ -182,12 +182,12 @@ def register_graph_callbacks(app):
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
-        Output("graph-log", "value", allow_duplicate=True),
+        Output("graph-log", "children", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Input("add-edge-button", "n_clicks"),
         State("network-graph", "elements"),
         State("network-graph", "selectedNodeData"),
-        State("graph-log", "value"),
+        State("graph-log", "children"),
         prevent_initial_call=True,
     )
     def add_edge_between_nodes(n_clicks, elements, selected_nodes, log_message):

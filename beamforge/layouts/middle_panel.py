@@ -145,10 +145,9 @@ def create_middle_panel():
                 ),
                 html.Div(
                     [
-                        dcc.Textarea(
+                        dcc.Markdown(
                             id="graph-log",
-                            value="",
-                            readOnly=True,
+                            children="",
                             style={
                                 "width": "100%",
                                 "height": "240px",

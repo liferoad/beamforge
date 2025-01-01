@@ -40,9 +40,9 @@ def format_log_with_timestamp(log_message):
 
     formatted_logs = []
     for log in log_message.splitlines():
-        if not log.startswith("["):  # Check if it already has a timestamp
-            timestamp = datetime.now().strftime("[%Y-%m-%d:%H-%M-%S]")
-            log = f"{timestamp} {log}"
+        if not log.startswith("**"):  # Check if it already has a timestamp
+            timestamp = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
+            log = f"**`{timestamp}`**: {log}  "
         formatted_logs.append(log)
 
     return "\n".join(formatted_logs) + "\n"
