@@ -92,9 +92,9 @@ def register_graph_callbacks(app):
     )
     def update_log(tapNode, tapEdge, log_message):
         if tapNode:
-            log_message += f"Node tapped: {tapNode['data']['id']}\n"
+            log_message += "Node tapped: %s\n" % tapNode["data"]["id"]
         if tapEdge:
-            log_message += f"Edge tapped: {tapEdge['data']['id']}\n"
+            log_message += "Edge tapped: %s\n" % tapEdge["data"]["id"]
         # Add other log messages based on graph interactions
         return log_message
 
@@ -126,13 +126,13 @@ def register_graph_callbacks(app):
 
             deleted_nodes = [node["id"] for node in selected_nodes] if selected_nodes else []
             deleted_edges = (
-                [f"({edge['source']}, {edge['target']})" for edge in selected_edges] if selected_edges else []
+                ["(%s, %s)" % (edge["source"], edge["target"]) for edge in selected_edges] if selected_edges else []
             )
 
             if deleted_nodes:
-                log_message += f"Deleted nodes: {', '.join(deleted_nodes)}\n"
+                log_message += "Deleted nodes: %s\n" % ", ".join(deleted_nodes)
             if deleted_edges:
-                log_message += f"Deleted edges: {', '.join(deleted_edges)}\n"
+                log_message += "Deleted edges: %s\n" % ", ".join(deleted_edges)
 
             new_elements = []
             for element in elements:
@@ -163,9 +163,9 @@ def register_graph_callbacks(app):
     )
     def add_new_node(n_clicks, elements, log_message):
         if n_clicks > 0:
-            new_node_id = f"node-{len([el for el in elements if 'source' not in el['data']]) + 1}"
+            new_node_id = "node-%s" % (len([el for el in elements if "source" not in el["data"]]) + 1)
             elements = elements + [{"data": {"id": new_node_id, "type": "UNKNOWN", "config": {}}}]
-            log_message += f"Added node: {new_node_id}\n"
+            log_message += "Added node: %s\n" % new_node_id
 
             # Generate YAML content
             yaml_string = generate_yaml_content(elements)
@@ -206,9 +206,9 @@ def register_graph_callbacks(app):
             if not edge_exists:
                 new_edge = {"data": {"source": source_id, "target": target_id}}
                 elements.append(new_edge)
-                log_message += f"Added edge between {source_id} and {target_id}\n"
+                log_message += "Added edge between %s and %s\n" % (source_id, target_id)
             else:
-                log_message += f"Edge already exists between {source_id} and {target_id}\n"
+                log_message += "Edge already exists between %s and %s\n" % (source_id, target_id)
 
             # Generate YAML content
             yaml_string = generate_yaml_content(elements)

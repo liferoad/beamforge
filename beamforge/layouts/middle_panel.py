@@ -154,6 +154,7 @@ def create_middle_panel():
                                 "height": "240px",
                                 "overflow": "auto",
                                 "fontFamily": "monospace",
+                                "fontSize": "15px",
                                 "border": "1px solid #ccc",
                                 "resize": "none",
                                 "marginTop": "5px",
