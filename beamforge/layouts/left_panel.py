@@ -1,4 +1,5 @@
 # third party libraries
+import dash_bootstrap_components as dbc
 import dash_resizable_panels as drp
 from dash import dcc, html
 from dash_ace import DashAceEditor
@@ -14,26 +15,55 @@ def create_left_panel():
                 "backgroundColor": "#F5F5F5",  # Set background color
             },
             children=[
-                html.H3(
-                    "BeamForge v0.0.1",
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            # Beam logo
+                            html.A(
+                                href="https://beam.apache.org/",
+                                target="_blank",
+                                children=[
+                                    html.Img(
+                                        src="/assets/beam_logo.png",
+                                        style={
+                                            "width": "100px",
+                                            "display": "block",
+                                            "cursor": "pointer",
+                                            "marginTop": "15px",
+                                            "marginRight": "5px",
+                                            "marginLeft": "5px",
+                                        },
+                                    ),
+                                ],
+                            )
+                        ),
+                        dbc.Col(
+                            html.H3(
+                                "BeamForge",
+                                style={
+                                    "width": "auto",
+                                    "textAlign": "center",
+                                    "fontSize": "28px",
+                                    "fontWeight": "bold",
+                                    "color": "#FF6F20",  # Primary orange color from the logo
+                                    "margin": "5px 5px",
+                                    "padding": "10px",
+                                    "paddingBottom": "8px",
+                                    "fontFamily": "Roboto, sans-serif",
+                                    "borderRadius": "5px",
+                                },
+                            )
+                        ),
+                    ],
                     style={
-                        "fontSize": "28px",
-                        "fontWeight": "bold",
-                        "color": "#FF6F20",  # Primary orange color from the logo
-                        "margin": "5px 5px",
-                        "padding": "10px",
-                        "borderBottom": "2px solid #FF6F20",  # Matching the header color
-                        "paddingBottom": "8px",
-                        "fontFamily": "Roboto, sans-serif",
-                        "backgroundColor": "rgba(255, 255, 255, 0.8)",
-                        "borderRadius": "5px",
+                        "borderBottom": "2px solid #FF6F20",
                     },
                 ),
                 dcc.Upload(
                     id="upload-data",
                     children=html.Div(
                         [
-                            html.A("Select Beam YAML File", style={"color": "#FF6F20", "fontWeight": "bold"}),
+                            html.A("Upload Beam YAML File Here", style={"color": "#FF6F20", "fontWeight": "bold"}),
                         ],
                         style={"display": "flex", "flexDirection": "column", "alignItems": "center"},
                     ),
@@ -66,7 +96,7 @@ def create_left_panel():
                     [
                         DashAceEditor(
                             id="yaml-content",
-                            value="",
+                            value="Display YAML content here...",
                             mode="yaml",
                             theme="tomorrow",
                             tabSize=2,
@@ -76,7 +106,7 @@ def create_left_panel():
                             style={
                                 "width": "95%",
                                 "height": "calc(100vh - 220px)",
-                                "margin": "10px",
+                                "margin": "5px",
                             },
                         ),
                     ],
@@ -85,7 +115,6 @@ def create_left_panel():
                 html.Div(
                     style={
                         "textAlign": "center",
-                        "marginTop": "10px",
                     },  # Center the logo and push it to the bottom
                     children=[
                         dcc.Download(id="download-yaml"),
@@ -93,50 +122,6 @@ def create_left_panel():
                             "Download File",
                             id="create-yaml-button",
                             className="beam-button",
-                        ),
-                    ],
-                ),
-                # Logos at the bottom
-                html.Div(
-                    style={
-                        "display": "flex",
-                        "flexDirection": "row",
-                        "justifyContent": "center",
-                        "alignItems": "center",
-                        "margin": "20px 0",
-                        "marginTop": "auto",
-                    },
-                    children=[
-                        # Beam logo
-                        html.A(
-                            href="https://beam.apache.org/",
-                            target="_blank",
-                            children=[
-                                html.Img(
-                                    src="/assets/beam_logo.png",
-                                    style={
-                                        "width": "80px",
-                                        "display": "block",
-                                        "cursor": "pointer",
-                                        "marginRight": "60px",  # Add some spacing between logos
-                                    },
-                                ),
-                            ],
-                        ),
-                        # GitHub logo
-                        html.A(
-                            href="https://github.com/apache/beam",
-                            target="_blank",
-                            children=[
-                                html.Img(
-                                    src="/assets/github-mark.png",
-                                    style={
-                                        "width": "40px",
-                                        "display": "block",
-                                        "cursor": "pointer",
-                                    },
-                                ),
-                            ],
                         ),
                     ],
                 ),
