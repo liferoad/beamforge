@@ -151,11 +151,12 @@ def create_middle_panel():
                             readOnly=True,
                             style={
                                 "width": "100%",
-                                "height": "200px",
+                                "height": "240px",
                                 "overflow": "auto",
                                 "fontFamily": "monospace",
                                 "border": "1px solid #ccc",
-                                "resize": "vertical",
+                                "resize": "none",
+                                "marginTop": "5px",
                             },
                         ),
                     ]
