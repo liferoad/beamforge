@@ -68,47 +68,52 @@ def register_node_callbacks(app):
             return "Click a node to see its details"
 
         # Create a formatted display of node data using dbc.Card with a custom background color
-        details = [
-            dbc.Row(
-                [
-                    dbc.Col(html.H5("Name:")),
-                    dbc.Col(
-                        dcc.Input(
-                            id="node-id-input",
-                            value=node_data["id"],
-                            type="text",
-                            style={
-                                "width": "80%",
-                            },
+        details = dbc.Container(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(html.H6("Name:"), width=4),
+                        dbc.Col(
+                            dcc.Input(
+                                id="node-id-input",
+                                value=node_data["id"],
+                                type="text",
+                            ),
+                            width=8,
                         ),
-                    ),
-                ],
-            ),
-            dbc.Row(
-                [
-                    dbc.Col(html.H5("Type:")),
-                    dbc.Col(
-                        dcc.Dropdown(
-                            id="node-type-dropdown",
-                            options=get_node_type_options(),
-                            value=node_data["type"],
-                            style={
-                                "width": "80%",
-                            },
+                    ],
+                    style={"margin-bottom": "10px"},
+                ),
+                dbc.Row(
+                    [
+                        dbc.Col(html.H6("Type:"), width=4),
+                        dbc.Col(
+                            dcc.Dropdown(
+                                id="node-type-dropdown",
+                                options=get_node_type_options(),
+                                value=node_data["type"],
+                            ),
+                            width=8,
                         ),
-                    ),
-                ],
-                className="mb-2",
-            ),
-            html.H5("Configuration:"),
-            DashAceEditor(
-                id="node-config-editor",
-                value=yaml.dump(node_data["config"], indent=2),
-                style={"width": "100%"},
-                theme="tomorrow",
-                mode="yaml",
-            ),
-        ]
+                    ],
+                    style={"margin-bottom": "10px"},
+                ),
+                dbc.Row(
+                    [
+                        html.H6("Configuration:"),
+                        DashAceEditor(
+                            id="node-config-editor",
+                            value=yaml.dump(node_data["config"], indent=2),
+                            style={"width": "100%"},
+                            theme="tomorrow",
+                            mode="yaml",
+                        ),
+                    ],
+                    style={"margin-bottom": "10px"},
+                ),
+            ],
+            fluid=True,
+        )
 
         return html.Div(details)
 
