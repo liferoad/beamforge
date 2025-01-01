@@ -20,11 +20,11 @@ def create_left_panel():
                         "fontSize": "28px",
                         "fontWeight": "bold",
                         "color": "#FF6F20",  # Primary orange color from the logo
-                        "margin": "20px 15px",
+                        "margin": "5px 5px",
                         "padding": "10px",
                         "borderBottom": "2px solid #FF6F20",  # Matching the header color
                         "paddingBottom": "8px",
-                        "fontFamily": "'Segoe UI', Arial, sans-serif",
+                        "fontFamily": "Roboto, sans-serif",
                         "backgroundColor": "rgba(255, 255, 255, 0.8)",
                         "borderRadius": "5px",
                     },
@@ -45,7 +45,7 @@ def create_left_panel():
                         "borderColor": "#FF6F20",
                         "borderRadius": "10px",
                         "textAlign": "center",
-                        "margin": "20px auto",
+                        "margin": "5px auto",
                         "backgroundColor": "#F5F5F5",
                         "display": "flex",
                         "alignItems": "center",
@@ -85,7 +85,7 @@ def create_left_panel():
                 html.Div(
                     style={
                         "textAlign": "center",
-                        "marginTop": "auto",
+                        "marginTop": "10px",
                     },  # Center the logo and push it to the bottom
                     children=[
                         dcc.Download(id="download-yaml"),

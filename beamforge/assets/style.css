@@ -1,3 +1,7 @@
+body {
+    font-family: 'Roboto', sans-serif;
+}
+
 .panel-resize-handle {
     background-color: #ccc;
     width: 1px;
@@ -26,6 +30,7 @@
     color: white;
     border: none;
     border-radius: 15px;
+    font-size: 14px;
 }
 
 .beam-button:hover {

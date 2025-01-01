@@ -12,6 +12,7 @@ def create_right_panel():
                     "Transform Details",
                     style={
                         "color": "#FF6F20",
+                        "fontFamily": "Roboto, sans-serif",
                     },
                 ),
                 html.Div(
