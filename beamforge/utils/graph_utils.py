@@ -1,3 +1,6 @@
+# standard libraries
+from datetime import datetime
+
 # third party libraries
 import yaml
 
@@ -29,3 +32,17 @@ def generate_yaml_content(elements):
 
     yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
     return yaml_string
+
+
+def format_log_with_timestamp(log_message):
+    if not log_message:
+        return ""
+
+    formatted_logs = []
+    for log in log_message.splitlines():
+        if not log.startswith("["):  # Check if it already has a timestamp
+            timestamp = datetime.now().strftime("[%Y-%m-%d:%H-%M-%S]")
+            log = f"{timestamp} {log}"
+        formatted_logs.append(log)
+
+    return "\n".join(formatted_logs) + "\n"

@@ -63,7 +63,7 @@ def create_left_panel():
                     id="upload-data",
                     children=html.Div(
                         [
-                            html.A("Upload Beam YAML File Here", style={"color": "#FF6F20", "fontWeight": "bold"}),
+                            html.A("Upload Beam YAML File Here", style={"color": "#FF6F20"}),
                         ],
                         style={"display": "flex", "flexDirection": "column", "alignItems": "center"},
                     ),

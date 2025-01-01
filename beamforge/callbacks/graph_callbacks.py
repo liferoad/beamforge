@@ -5,7 +5,7 @@ import io
 # third party libraries
 import dash
 from dash import Input, Output, State
-from utils.graph_utils import generate_yaml_content
+from utils.graph_utils import format_log_with_timestamp, generate_yaml_content
 from utils.yaml_parser import parse_beam_yaml
 
 
@@ -91,12 +91,12 @@ def register_graph_callbacks(app):
         # Add other inputs as needed for more interactions
     )
     def update_log(tapNode, tapEdge, log_message):
-        if tapNode:
-            log_message += "Node tapped: %s\n" % tapNode["data"]["id"]
         if tapEdge:
-            log_message += "Edge tapped: %s\n" % tapEdge["data"]["id"]
-        # Add other log messages based on graph interactions
-        return log_message
+            log_message += "Edge tapped: %s -> %s\n" % (tapEdge["data"]["source"], tapEdge["data"]["target"])
+        elif tapNode:
+            log_message += "Node tapped: %s\n" % tapNode["data"]["id"]
+
+        return format_log_with_timestamp(log_message)
 
     @app.callback(
         Output("delete-selected", "disabled"),
@@ -149,8 +149,8 @@ def register_graph_callbacks(app):
             # Generate YAML content
             yaml_string = generate_yaml_content(new_elements)
 
-            return new_elements, log_message, yaml_string
-        return elements, log_message, dash.no_update
+            return new_elements, format_log_with_timestamp(log_message), yaml_string
+        return elements, format_log_with_timestamp(log_message), dash.no_update
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
@@ -170,8 +170,8 @@ def register_graph_callbacks(app):
             # Generate YAML content
             yaml_string = generate_yaml_content(elements)
 
-            return elements, log_message, yaml_string
-        return elements, log_message, dash.no_update
+            return elements, format_log_with_timestamp(log_message), yaml_string
+        return elements, format_log_with_timestamp(log_message), dash.no_update
 
     @app.callback(
         Output("add-edge-button", "disabled"),
@@ -213,5 +213,5 @@ def register_graph_callbacks(app):
             # Generate YAML content
             yaml_string = generate_yaml_content(elements)
 
-            return elements, log_message, yaml_string
-        return elements, log_message, dash.no_update
+            return elements, format_log_with_timestamp(log_message), yaml_string
+        return elements, format_log_with_timestamp(log_message), dash.no_update
