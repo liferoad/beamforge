@@ -15,22 +15,19 @@ def parse_beam_transforms():
 
     transforms = {}
 
-    # Find all transform category headings
-    for h2 in soup.find_all("h2"):
-        # Skip non-transform sections
-        if not h2.text.lower().endswith("transforms"):
-            continue
+    # Find all transform headings (h2 with id)
+    for h2 in soup.find_all("h2", id=True):
+        transform_name = h2.text.strip()
 
-        # Process each transform in this category
-        current = h2.find_next_sibling()
-        while current and current.name != "h2":
-            if current.name == "h3":
-                # This is a transform definition
-                transform_name = current.text.strip()
-                # Get the usage example from the next pre block
-                usage_block = current.find_next("pre")
-                if usage_block:
-                    transforms[transform_name] = usage_block.text.strip()
-            current = current.find_next_sibling()
+        # Find the next usage example
+        usage_block = None
+        next_sibling = h2.find_next_sibling()
+        while next_sibling and not usage_block:
+            if next_sibling.name == "div" and "codehilite" in next_sibling.get("class", []):
+                usage_block = next_sibling.find("pre")
+            next_sibling = next_sibling.find_next_sibling()
+
+        if usage_block:
+            transforms[transform_name] = usage_block.text.strip()
 
     return transforms
