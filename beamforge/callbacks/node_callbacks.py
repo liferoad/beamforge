@@ -6,59 +6,11 @@ from dash import Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 
 from beamforge.utils.graph_utils import format_log_with_timestamp, generate_yaml_content
+from beamforge.utils.transform_parser import BEAM_YAML_TRANSFORMS
 
 
 def get_node_type_options():
-    return [
-        {"label": "AssertEqual", "value": "AssertEqual"},
-        {"label": "AssignTimestamps", "value": "AssignTimestamps"},
-        {"label": "Combine", "value": "Combine"},
-        {"label": "Create", "value": "Create"},
-        {"label": "Enrichment", "value": "Enrichment"},
-        {"label": "Explode", "value": "Explode"},
-        {"label": "Filter", "value": "Filter"},
-        {"label": "Flatten", "value": "Flatten"},
-        {"label": "Join", "value": "Join"},
-        {"label": "LogForTesting", "value": "LogForTesting"},
-        {"label": "MLTransform", "value": "MLTransform"},
-        {"label": "MapToFields", "value": "MapToFields"},
-        {"label": "Partition", "value": "Partition"},
-        {"label": "PyTransform", "value": "PyTransform"},
-        {"label": "Sql", "value": "Sql"},
-        {"label": "StripErrorMetadata", "value": "StripErrorMetadata"},
-        {"label": "ValidateWithSchema", "value": "ValidateWithSchema"},
-        {"label": "WindowInto", "value": "WindowInto"},
-        {"label": "ReadFromAvro", "value": "ReadFromAvro"},
-        {"label": "WriteToAvro", "value": "WriteToAvro"},
-        {"label": "ReadFromBigQuery", "value": "ReadFromBigQuery"},
-        {"label": "WriteToBigQuery", "value": "WriteToBigQuery"},
-        {"label": "ReadFromCsv", "value": "ReadFromCsv"},
-        {"label": "WriteToCsv", "value": "WriteToCsv"},
-        {"label": "ReadFromJdbc", "value": "ReadFromJdbc"},
-        {"label": "WriteToJdbc", "value": "WriteToJdbc"},
-        {"label": "ReadFromJson", "value": "ReadFromJson"},
-        {"label": "WriteToJson", "value": "WriteToJson"},
-        {"label": "ReadFromKafka", "value": "ReadFromKafka"},
-        {"label": "WriteToKafka", "value": "WriteToKafka"},
-        {"label": "ReadFromMySql", "value": "ReadFromMySql"},
-        {"label": "WriteToMySql", "value": "WriteToMySql"},
-        {"label": "ReadFromOracle", "value": "ReadFromOracle"},
-        {"label": "WriteToOracle", "value": "WriteToOracle"},
-        {"label": "ReadFromParquet", "value": "ReadFromParquet"},
-        {"label": "WriteToParquet", "value": "WriteToParquet"},
-        {"label": "ReadFromPostgres", "value": "ReadFromPostgres"},
-        {"label": "WriteToPostgres", "value": "WriteToPostgres"},
-        {"label": "ReadFromPubSub", "value": "ReadFromPubSub"},
-        {"label": "WriteToPubSub", "value": "WriteToPubSub"},
-        {"label": "ReadFromPubSubLite", "value": "ReadFromPubSubLite"},
-        {"label": "WriteToPubSubLite", "value": "WriteToPubSubLite"},
-        {"label": "ReadFromSpanner", "value": "ReadFromSpanner"},
-        {"label": "WriteToSpanner", "value": "WriteToSpanner"},
-        {"label": "ReadFromSqlServer", "value": "ReadFromSqlServer"},
-        {"label": "WriteToSqlServer", "value": "WriteToSqlServer"},
-        {"label": "ReadFromText", "value": "ReadFromText"},
-        {"label": "WriteToText", "value": "WriteToText"},
-    ]
+    return [{"label": transform, "value": transform} for transform in BEAM_YAML_TRANSFORMS]
 
 
 def register_node_callbacks(app):

@@ -1,4 +1,5 @@
 # third party libraries
+import apache_beam as beam
 import requests
 from bs4 import BeautifulSoup
 
@@ -9,7 +10,7 @@ def parse_beam_transforms():
     Returns:
         dict: Dictionary where keys are transform names and values are usage strings
     """
-    url = "https://beam.apache.org/releases/yamldoc/2.61.0/"
+    url = f"https://beam.apache.org/releases/yamldoc/{beam.__version__}/"
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
 
@@ -31,3 +32,6 @@ def parse_beam_transforms():
             transforms[transform_name] = usage_block.text.strip()
 
     return transforms
+
+
+BEAM_YAML_TRANSFORMS = parse_beam_transforms()
