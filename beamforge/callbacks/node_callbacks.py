@@ -165,6 +165,9 @@ def register_node_callbacks(app):
         prevent_initial_call=True,
     )
     def update_node_id(new_node_id, node_data, elements, log_message):
+        if len(new_node_id) == 0:
+            log_message += "Node ID cannot be empty\n"
+            return dash.no_update, dash.no_update, dash.no_update, format_log_with_timestamp(log_message)
         if node_data and node_data["id"] != new_node_id:
             old_node_id = node_data["id"]
             updated_elements = []
