@@ -130,11 +130,28 @@ def register_node_callbacks(app):
             for element in elements:
                 if element.get("data") and element["data"].get("id") == node_id:
                     element["data"]["type"] = new_type
+                    element["data"]["config"] = {}  # Reset config to empty
                 updated_elements.append(element)
             yaml_content = generate_yaml_content(updated_elements)
             log_message += f"Changed type of node '{node_data['id']}' to '{new_type}'"
-            return updated_elements, yaml_content, format_log_with_timestamp(log_message)
+            return (
+                updated_elements,
+                yaml_content,
+                format_log_with_timestamp(log_message),
+            )
         return dash.no_update, dash.no_update, dash.no_update
+
+    @app.callback(
+        Output("node-config-editor", "value"),
+        Output("node-config-usage", "value"),
+        Input("node-type-dropdown", "value"),
+        State("network-graph", "tapNodeData"),
+        prevent_initial_call=True,
+    )
+    def update_node_config_and_usage(new_type, node_data):
+        if node_data:
+            return yaml.dump({}, indent=2), BEAM_YAML_TRANSFORMS[new_type]
+        return dash.no_update, dash.no_update
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
