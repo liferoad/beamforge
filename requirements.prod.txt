@@ -26,3 +26,5 @@ pyyaml
 dash-resizable-panels
 dash-ace
 dash-bootstrap-components
+
+beautifulsoup4
