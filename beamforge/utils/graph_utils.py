@@ -1,4 +1,5 @@
 # standard libraries
+import re
 from datetime import datetime
 
 # third party libraries
@@ -44,5 +45,19 @@ def format_log_with_timestamp(log_message):
             timestamp = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
             log = f"**`{timestamp}`**: {log}  "
         formatted_logs.append(log)
+
+    # Sort logs by timestamp (latest to oldest)
+    formatted_logs = sorted(
+        formatted_logs,
+        key=lambda log: (
+            datetime.strptime(
+                re.search(r"\*\*`\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]`\*\*", log).group(0)[4:23],
+                "%Y-%m-%d %H:%M:%S",
+            )
+            if re.search(r"\*\*`\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]`\*\*", log)
+            else datetime.min
+        ),
+        reverse=True,
+    )
 
     return "\n".join(formatted_logs) + "\n"
