@@ -57,117 +57,120 @@ def get_stylesheet():
 
 def create_middle_panel():
     return drp.Panel(
-        html.Div(
-            [
-                # Toolbar for zoom/graph controls
-                html.Div(
-                    [
+        [
+            drp.PanelGroup(
+                [
+                    drp.Panel(
+                        [
+                            # Toolbar for zoom/graph controls
+                            html.Div(
+                                [
+                                    html.Div(
+                                        [
+                                            html.Button(
+                                                "Add Node",
+                                                id="add-node-button",
+                                                className="beam-button",
+                                            ),
+                                            html.Button(
+                                                "Add Edge",
+                                                id="add-edge-button",
+                                                n_clicks=0,
+                                                className="beam-button",
+                                                disabled=True,
+                                            ),
+                                            html.Button(
+                                                "Delete Selected",
+                                                id="delete-selected",
+                                                n_clicks=0,
+                                                className="beam-button",
+                                                disabled=True,
+                                            ),
+                                        ],
+                                        style={"float": "left"},
+                                    ),  # Added float left to put other buttons to the left
+                                    html.Div(
+                                        [
+                                            html.Button(
+                                                "Zoom In",
+                                                id="zoom-in",
+                                                n_clicks=0,
+                                                className="beam-button",
+                                            ),
+                                            html.Button(
+                                                "Zoom Out",
+                                                id="zoom-out",
+                                                n_clicks=0,
+                                                className="beam-button",
+                                            ),
+                                            html.Button(
+                                                "Reset View",
+                                                id="reset-view",
+                                                n_clicks=0,
+                                                className="beam-button",
+                                            ),
+                                        ],
+                                        style={"float": "right"},
+                                    ),  # Added float right to put zoom buttons to the right
+                                ],
+                                style={
+                                    "margin-bottom": "10px",
+                                    "display": "flex",
+                                    "justifyContent": "space-between",
+                                    "width": "100%",
+                                },
+                            ),
+                            html.Div(
+                                [
+                                    cyto.Cytoscape(
+                                        id="network-graph",
+                                        layout={
+                                            "name": "dagre",
+                                            "rankDir": "TB",
+                                            "rankSep": 30,
+                                            "nodeSep": 50,
+                                            "padding": 10,
+                                            "animate": True,
+                                        },
+                                        style={
+                                            "width": "100%",
+                                            "height": "calc(75vh)",
+                                            "borderRadius": "4px",
+                                            "backgroundColor": "#F5F5F5",
+                                        },
+                                        stylesheet=get_stylesheet(),
+                                        elements=[],
+                                        zoom=0.8,
+                                        pan={"x": 0, "y": 0},
+                                    ),
+                                ]
+                            ),
+                        ],
+                        defaultSizePercentage=80,
+                    ),
+                    drp.PanelResizeHandle(html.Div(className="resize-handle-vertical")),
+                    drp.Panel(
                         html.Div(
                             [
-                                html.Button(
-                                    "Add Node",
-                                    id="add-node-button",
-                                    className="beam-button",
+                                dcc.Markdown(
+                                    id="graph-log",
+                                    children="",
+                                    style={
+                                        "width": "100%",
+                                        "height": "calc(20vh)",
+                                        "textAlign": "left",
+                                        "overflow": "auto",
+                                        "fontFamily": "monospace",
+                                        "fontSize": "15px",
+                                        "border": "1px",
+                                    },
                                 ),
-                                html.Button(
-                                    "Add Edge",
-                                    id="add-edge-button",
-                                    n_clicks=0,
-                                    className="beam-button",
-                                    disabled=True,
-                                ),
-                                html.Button(
-                                    "Delete Selected",
-                                    id="delete-selected",
-                                    n_clicks=0,
-                                    className="beam-button",
-                                    disabled=True,
-                                ),
-                            ],
-                            style={"float": "left"},
-                        ),  # Added float left to put other buttons to the left
-                        html.Div(
-                            [
-                                html.Button(
-                                    "Zoom In",
-                                    id="zoom-in",
-                                    n_clicks=0,
-                                    className="beam-button",
-                                ),
-                                html.Button(
-                                    "Zoom Out",
-                                    id="zoom-out",
-                                    n_clicks=0,
-                                    className="beam-button",
-                                ),
-                                html.Button(
-                                    "Reset View",
-                                    id="reset-view",
-                                    n_clicks=0,
-                                    className="beam-button",
-                                ),
-                            ],
-                            style={"float": "right"},
-                        ),  # Added float right to put zoom buttons to the right
-                    ],
-                    style={
-                        "margin-bottom": "10px",
-                        "display": "flex",
-                        "justifyContent": "space-between",
-                        "width": "100%",
-                    },
-                ),
-                html.Div(
-                    [
-                        cyto.Cytoscape(
-                            id="network-graph",
-                            layout={
-                                "name": "dagre",
-                                "rankDir": "TB",
-                                "rankSep": 30,
-                                "nodeSep": 50,
-                                "padding": 10,
-                                "animate": True,
-                            },
-                            style={
-                                "width": "100%",
-                                "height": "calc(80vh - 120px)",
-                                "overflow": "auto",
-                                "borderRadius": "4px",
-                                "backgroundColor": "#F5F5F5",
-                            },
-                            stylesheet=get_stylesheet(),
-                            elements=[],
-                            zoom=1.0,
-                            pan={"x": 0, "y": 0},
+                            ]
                         ),
-                    ]
-                ),
-                html.Div(
-                    [
-                        dcc.Markdown(
-                            id="graph-log",
-                            children="",
-                            style={
-                                "width": "100%",
-                                "height": "240px",
-                                "overflow": "auto",
-                                "fontFamily": "monospace",
-                                "fontSize": "15px",
-                                "border": "1px solid #ccc",
-                                "resize": "none",
-                                "marginTop": "5px",
-                            },
-                        ),
-                    ]
-                ),
-            ],
-            style={
-                "height": "100%",
-                "position": "relative",
-                "display": "flex",
-                "flexDirection": "column",
-            },
-        ),
-        defaultSizePercentage=60,
+                        defaultSizePercentage=20,
+                    ),
+                ],
+                direction="vertical",
+            )
+        ],
     )
