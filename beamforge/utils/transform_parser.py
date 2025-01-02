@@ -15,6 +15,7 @@ def parse_beam_transforms():
     soup = BeautifulSoup(response.content, "html.parser")
 
     transforms = {}
+    transforms["UNKNOWN"] = "Usage not found."
 
     # Find all transform headings (h2 with id)
     for h2 in soup.find_all("h2", id=True):
