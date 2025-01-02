@@ -103,14 +103,13 @@ def create_left_panel():
                             enableLiveAutocompletion=True,
                             showGutter=True,
                             readOnly=True,
+                            maxLines=5000,
                             style={
-                                "width": "95%",
-                                "height": "calc(100vh - 220px)",
                                 "margin": "5px",
                             },
                         ),
                     ],
-                    style={"height": "calc(100% - 170px)", "overflow": "auto"},
+                    style={"overflow": "auto"},
                 ),
                 html.Div(
                     style={
