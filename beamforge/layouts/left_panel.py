@@ -11,14 +11,13 @@ def create_left_panel():
             style={
                 "display": "flex",
                 "flexDirection": "column",
-                "height": "100%",  # Ensure the div takes full height
-                "backgroundColor": "#F5F5F5",  # Set background color
+                "height": "100%",
+                "backgroundColor": "#F5F5F5",
             },
             children=[
                 dbc.Row(
                     [
                         dbc.Col(
-                            # Beam logo
                             html.A(
                                 href="https://beam.apache.org/",
                                 target="_blank",
@@ -45,7 +44,7 @@ def create_left_panel():
                                     "textAlign": "center",
                                     "fontSize": "28px",
                                     "fontWeight": "bold",
-                                    "color": "#FF6F20",  # Primary orange color from the logo
+                                    "color": "#FF6F20",
                                     "margin": "5px 5px",
                                     "padding": "10px",
                                     "paddingBottom": "8px",
@@ -75,7 +74,7 @@ def create_left_panel():
                         "borderColor": "#FF6F20",
                         "borderRadius": "10px",
                         "textAlign": "center",
-                        "margin": "5px auto",
+                        "margin": "10px auto",
                         "backgroundColor": "#F5F5F5",
                         "display": "flex",
                         "alignItems": "center",
@@ -93,7 +92,8 @@ def create_left_panel():
                     accept=".yaml,.yml",
                 ),
                 html.Div(
-                    [
+                    style={"flexGrow": "1", "overflow": "auto"},
+                    children=[
                         DashAceEditor(
                             id="yaml-content",
                             value="Display YAML content here...",
@@ -105,16 +105,17 @@ def create_left_panel():
                             readOnly=True,
                             maxLines=5000,
                             style={
-                                "margin": "5px",
+                                "margin": "10px",
                             },
                         ),
                     ],
-                    style={"overflow": "auto"},
                 ),
                 html.Div(
                     style={
                         "textAlign": "center",
-                    },  # Center the logo and push it to the bottom
+                        "marginTop": "auto",
+                        "marginBottom": "10px",
+                    },
                     children=[
                         dcc.Download(id="download-yaml"),
                         html.Button(

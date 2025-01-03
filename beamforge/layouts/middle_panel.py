@@ -183,6 +183,7 @@ def create_middle_panel():
                                     ],
                                     style={
                                         "textAlign": "center",
+                                        "marginTop": "auto",
                                     },
                                 ),
                             ]
