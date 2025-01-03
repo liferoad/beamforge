@@ -44,8 +44,12 @@ def _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message):
         with open(yaml_path, "w") as f:
             f.write(yaml_content)
 
+        dry_run = False
+        if pipeline_options and "--dry_run True" in pipeline_options:
+            dry_run = True
+
         # Construct the command
-        if runner == "DataflowRunner":
+        if runner == "DataflowRunner" and not dry_run:
             command = [
                 "gcloud",
                 "dataflow",
