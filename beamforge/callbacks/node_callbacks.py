@@ -1,5 +1,7 @@
 # standard libraries
+import datetime
 import os
+import random
 import subprocess
 import tempfile
 
@@ -18,6 +20,22 @@ def get_node_type_options():
     return [{"label": transform, "value": transform} for transform in BEAM_YAML_TRANSFORMS]
 
 
+def create_dataflow_job_name(base_name="dataflow-job"):
+    """
+    Creates a Dataflow job name with the following format:
+    {base_name}-{timestamp}-{random_number}
+
+    Args:
+      base_name: The base name for the job.
+
+    Returns:
+      A string representing the Dataflow job name.
+    """
+    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    random_number = random.randint(1000, 9999)
+    return f"{base_name}-{timestamp}-{random_number}"
+
+
 def _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message):
     with tempfile.TemporaryDirectory() as tmp_dir:
         yaml_path = os.path.join(tmp_dir, "pipeline.yaml")
@@ -27,13 +45,23 @@ def _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message):
             f.write(yaml_content)
 
         # Construct the command
-        command = [
-            "python",
-            "-m",
-            "apache_beam.yaml.main",
-            f"--yaml_pipeline_file={yaml_path}",
-            f"--runner={runner}",
-        ]
+        if runner == "DataflowRunner":
+            command = [
+                "gcloud",
+                "dataflow",
+                "yaml",
+                "run",
+                create_dataflow_job_name(),
+                f"--yaml-pipeline-file={yaml_path}",
+            ]
+        else:
+            command = [
+                "python",
+                "-m",
+                "apache_beam.yaml.main",
+                f"--yaml_pipeline_file={yaml_path}",
+                f"--runner={runner}",
+            ]
         if pipeline_options:
             command.extend(pipeline_options.split())
 

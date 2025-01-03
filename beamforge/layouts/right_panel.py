@@ -68,14 +68,14 @@ def create_right_panel():
                                                 options=[
                                                     {
                                                         "label": "Prism",
-                                                        "value": "prism",
+                                                        "value": "PrismRunner",
                                                     },
                                                     {
                                                         "label": "Dataflow",
-                                                        "value": "dataflow",
+                                                        "value": "DataflowRunner",
                                                     },
                                                 ],
-                                                value="prism",
+                                                value="PrismRunner",
                                                 style={"border": "1px solid #ced4da", "fontSize": "14px"},
                                             ),
                                         ],
@@ -87,7 +87,7 @@ def create_right_panel():
                                             dcc.Textarea(
                                                 id="pipeline-options-input",
                                                 placeholder="Enter other pipeline options. \n"
-                                                "Examples: --project your_gcp_project.",
+                                                "Examples: --project your_gcp_project --region us-central1",
                                                 style={
                                                     "width": "100%",
                                                     "height": "100px",
