@@ -79,7 +79,7 @@ def create_right_panel():
                                                 style={"border": "1px solid #ced4da", "fontSize": "14px"},
                                             ),
                                         ],
-                                        style={"margin-bottom": "5px"},
+                                        style={"margin-bottom": "10px"},
                                     ),
                                     html.Div(
                                         [

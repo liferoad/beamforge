@@ -277,3 +277,14 @@ def register_node_callbacks(app):
             return dash.no_update, dash.no_update
 
         return _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message), False
+
+    @app.callback(
+        Output("graph-log", "children", allow_duplicate=True),
+        Input("clear-graph-logs", "n_clicks"),
+        prevent_initial_call=True,
+    )
+    def clear_graph_logs(n_clicks):
+        if n_clicks is None:
+            return dash.no_update
+        else:
+            return ""

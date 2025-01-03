@@ -160,7 +160,7 @@ def create_middle_panel():
                                             children="",
                                             style={
                                                 "width": "100%",
-                                                "height": "calc(20vh)",
+                                                "height": "calc(15vh)",
                                                 "textAlign": "left",
                                                 "overflow": "auto",
                                                 "fontFamily": "monospace",
@@ -171,6 +171,19 @@ def create_middle_panel():
                                     ],
                                     overlay_style={"visibility": "visible", "opacity": 0.5, "backgroundColor": "white"},
                                     custom_spinner=html.H2(["Loading...", dbc.Spinner(color="#FF6F20")]),
+                                ),
+                                html.Div(
+                                    [
+                                        html.Button(
+                                            "Clear Logs",
+                                            id="clear-graph-logs",
+                                            n_clicks=0,
+                                            className="beam-button",
+                                        ),
+                                    ],
+                                    style={
+                                        "textAlign": "center",
+                                    },
                                 ),
                             ]
                         ),
