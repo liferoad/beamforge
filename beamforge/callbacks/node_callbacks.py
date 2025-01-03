@@ -1,7 +1,9 @@
 # standard libraries
+# standard libraries
 import datetime
 import os
 import random
+import re
 import subprocess
 import tempfile
 
@@ -36,7 +38,38 @@ def create_dataflow_job_name(base_name="dataflow-job"):
     return f"{base_name}-{timestamp}-{random_number}"
 
 
+def extract_job_id_and_create_url(output, region="us-central1"):
+    """
+    Extracts the job ID from the output of a subprocess call and creates the Dataflow job URL.
+
+    Args:
+      output: The output from the subprocess call.
+      region: The region where the job was run.
+
+    Returns:
+      The Dataflow job URL, or None if the job ID could not be extracted.
+    """
+    match = re.search(r"id: (\S+)", output)
+    if match:
+        job_id = match.group(1)
+        return f"https://pantheon.corp.google.com/dataflow/jobs/{region}/{job_id}"
+    return None
+
+
 def _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message):
+    region = None
+    if pipeline_options:
+        region_match = re.search(r"--region\s+([\w-]+)", pipeline_options)
+        if region_match:
+            region = region_match.group(1)
+
+    if runner == "DataflowRunner" and region is None:
+        region = "us-central1"
+        if pipeline_options:
+            pipeline_options += " --region us-central1"
+        else:
+            pipeline_options = "--region us-central1"
+
     with tempfile.TemporaryDirectory() as tmp_dir:
         yaml_path = os.path.join(tmp_dir, "pipeline.yaml")
 
@@ -76,6 +109,10 @@ def _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message):
             output = (stdout.decode() + "\n" + stderr.decode()).strip()
             log_message += f"Ran pipeline with command: {' '.join(command)}\n"
             log_message += f"Output:\n{output}\n"
+            if runner == "DataflowRunner" and not dry_run:
+                dataflow_url = extract_job_id_and_create_url(output, region)
+                if dataflow_url:
+                    log_message += f"Dataflow job URL: {dataflow_url}\n"
         except Exception as e:
             log_message += f"Error running pipeline: {e}\n"
 
