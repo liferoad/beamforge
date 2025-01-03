@@ -58,7 +58,6 @@ def get_stylesheet():
 def create_middle_panel():
     return drp.Panel(
         [
-            dcc.Store(id="pipeline-output-store", storage_type="memory"),
             drp.PanelGroup(
                 [
                     drp.Panel(

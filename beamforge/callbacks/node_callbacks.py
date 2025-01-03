@@ -194,7 +194,6 @@ def register_node_callbacks(app):
 
     @app.callback(
         Output("graph-log", "children", allow_duplicate=True),
-        Output("pipeline-output-store", "data"),
         Input("run-pipeline-button", "n_clicks"),
         State("pipeline-runner-dropdown", "value"),
         State("pipeline-options-input", "value"),
@@ -204,7 +203,7 @@ def register_node_callbacks(app):
     )
     def run_beam_pipeline(n_clicks, runner, pipeline_options, yaml_content, log_message):
         if n_clicks is None:
-            return dash.no_update, dash.no_update
+            return dash.no_update
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             yaml_path = os.path.join(tmp_dir, "pipeline.yaml")
@@ -233,18 +232,6 @@ def register_node_callbacks(app):
                 log_message += f"Output:\n{output}\n"
             except Exception as e:
                 log_message += f"Error running pipeline: {e}\n"
-                output = ""
 
-            return format_log_with_timestamp(log_message), output
-
-    @app.callback(
-        Output("graph-log", "children", allow_duplicate=True),
-        Input("pipeline-output-store", "data"),
-        State("graph-log", "children"),
-        prevent_initial_call=True,
-    )
-    def update_graph_log_with_pipeline_output(pipeline_output, log_message):
-        if pipeline_output is None:
-            return dash.no_update
-        log_message += pipeline_output + "\n"
+            return format_log_with_timestamp(log_message)
         return format_log_with_timestamp(log_message)
