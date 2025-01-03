@@ -1,4 +1,5 @@
 # third party libraries
+import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import dash_resizable_panels as drp
 from dash import dcc, html
@@ -152,18 +153,24 @@ def create_middle_panel():
                     drp.Panel(
                         html.Div(
                             [
-                                dcc.Markdown(
-                                    id="graph-log",
-                                    children="",
-                                    style={
-                                        "width": "100%",
-                                        "height": "calc(20vh)",
-                                        "textAlign": "left",
-                                        "overflow": "auto",
-                                        "fontFamily": "monospace",
-                                        "fontSize": "15px",
-                                        "border": "1px",
-                                    },
+                                dcc.Loading(
+                                    [
+                                        dcc.Markdown(
+                                            id="graph-log",
+                                            children="",
+                                            style={
+                                                "width": "100%",
+                                                "height": "calc(20vh)",
+                                                "textAlign": "left",
+                                                "overflow": "auto",
+                                                "fontFamily": "monospace",
+                                                "fontSize": "15px",
+                                                "border": "1px",
+                                            },
+                                        ),
+                                    ],
+                                    overlay_style={"visibility": "visible", "opacity": 0.5, "backgroundColor": "white"},
+                                    custom_spinner=html.H2(["Loading...", dbc.Spinner(color="#FF6F20")]),
                                 ),
                             ]
                         ),

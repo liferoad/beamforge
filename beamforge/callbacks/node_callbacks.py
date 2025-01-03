@@ -18,6 +18,38 @@ def get_node_type_options():
     return [{"label": transform, "value": transform} for transform in BEAM_YAML_TRANSFORMS]
 
 
+def _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message):
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        yaml_path = os.path.join(tmp_dir, "pipeline.yaml")
+
+        # Create a temporary file for the YAML content
+        with open(yaml_path, "w") as f:
+            f.write(yaml_content)
+
+        # Construct the command
+        command = [
+            "python",
+            "-m",
+            "apache_beam.yaml.main",
+            f"--yaml_pipeline_file={yaml_path}",
+            f"--runner={runner}",
+        ]
+        if pipeline_options:
+            command.extend(pipeline_options.split())
+
+        # Execute the command and capture the output
+        try:
+            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = process.communicate()
+            output = (stdout.decode() + "\n" + stderr.decode()).strip()
+            log_message += f"Ran pipeline with command: {' '.join(command)}\n"
+            log_message += f"Output:\n{output}\n"
+        except Exception as e:
+            log_message += f"Error running pipeline: {e}\n"
+
+    return format_log_with_timestamp(log_message)
+
+
 def register_node_callbacks(app):
     @app.callback(Output("node-data", "children"), Input("network-graph", "tapNodeData"))
     def display_node_data(node_data):
@@ -193,7 +225,18 @@ def register_node_callbacks(app):
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
     @app.callback(
+        Output("run-pipeline-button", "disabled"),
+        Input("run-pipeline-button", "n_clicks"),
+    )
+    def disable_run_pipeline_button(n_clicks):
+        if n_clicks is None:
+            return False  # Button starts enabled
+        else:
+            return True  # Disable after click
+
+    @app.callback(
         Output("graph-log", "children", allow_duplicate=True),
+        Output("run-pipeline-button", "disabled", allow_duplicate=True),
         Input("run-pipeline-button", "n_clicks"),
         State("pipeline-runner-dropdown", "value"),
         State("pipeline-options-input", "value"),
@@ -203,35 +246,6 @@ def register_node_callbacks(app):
     )
     def run_beam_pipeline(n_clicks, runner, pipeline_options, yaml_content, log_message):
         if n_clicks is None:
-            return dash.no_update
+            return dash.no_update, dash.no_update
 
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            yaml_path = os.path.join(tmp_dir, "pipeline.yaml")
-
-            # Create a temporary file for the YAML content
-            with open(yaml_path, "w") as f:
-                f.write(yaml_content)
-
-            # Construct the command
-            command = [
-                "python",
-                "-m",
-                "apache_beam.yaml.main",
-                f"--yaml_pipeline_file={yaml_path}",
-                f"--runner={runner}",
-            ]
-            if pipeline_options:
-                command.extend(pipeline_options.split())
-
-            # Execute the command and capture the output
-            try:
-                process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                stdout, stderr = process.communicate()
-                output = (stdout.decode() + "\n" + stderr.decode()).strip()
-                log_message += f"Ran pipeline with command: {' '.join(command)}\n"
-                log_message += f"Output:\n{output}\n"
-            except Exception as e:
-                log_message += f"Error running pipeline: {e}\n"
-
-            return format_log_with_timestamp(log_message)
-        return format_log_with_timestamp(log_message)
+        return _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message), False
