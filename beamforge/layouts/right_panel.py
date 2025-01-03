@@ -76,6 +76,7 @@ def create_right_panel():
                                                     },
                                                 ],
                                                 value="prism",
+                                                style={"border": "1px solid #ced4da", "fontSize": "14px"},
                                             ),
                                         ],
                                         style={"margin-bottom": "5px"},
@@ -85,11 +86,13 @@ def create_right_panel():
                                             html.H6("Options:"),
                                             dcc.Textarea(
                                                 id="pipeline-options-input",
-                                                placeholder="Enter pipeline options. Examples: --project "
-                                                "your_gcp_project.",
+                                                placeholder="Enter other pipeline options. \n"
+                                                "Examples: --project your_gcp_project.",
                                                 style={
                                                     "width": "100%",
                                                     "height": "100px",
+                                                    "border": "1px solid #ced4da",
+                                                    "fontSize": "14px",
                                                 },
                                             ),
                                         ]
