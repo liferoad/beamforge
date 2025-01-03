@@ -101,6 +101,21 @@ def create_right_panel():
                             )
                         ]
                     ),
+                    html.Div(
+                        [
+                            html.Button(
+                                "Run Pipeline",
+                                id="run-pipeline-button",
+                                className="beam-button",
+                                style={
+                                    "marginTop": "10px",
+                                },
+                            ),
+                        ],
+                        style={
+                            "textAlign": "center",
+                        },
+                    ),
                 ]
             ),
         ],
