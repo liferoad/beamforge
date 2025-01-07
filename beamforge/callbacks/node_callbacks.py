@@ -170,7 +170,7 @@ def register_node_callbacks(app):
                             maxLines=5000,
                         ),
                     ],
-                    style={"margin-bottom": "5px"},
+                    style={"margin-bottom": "10px"},
                 ),
                 dbc.Row(
                     [
@@ -203,19 +203,20 @@ def register_node_callbacks(app):
         prevent_initial_call=True,
     )
     def save_node_config(config_value, node_data, elements, log_message):
-        if node_data:
+        if node_data and config_value:
             try:
                 new_config = yaml.safe_load(config_value)
                 node_id = node_data["id"]
                 updated_elements = []
                 for element in elements:
-                    if element.get("data") and element["data"].get("id") == node_id:
+                    if element.get("data") and element["data"].get("id") == node_id and new_config != {}:
                         element["data"]["config"] = new_config
                     updated_elements.append(element)
                 yaml_content = generate_yaml_content(updated_elements)
                 log_message += f"Updated config for node '{node_data['id']}'\n"
                 return updated_elements, yaml_content, format_log_with_timestamp(log_message)
-            except yaml.YAMLError:
+            except yaml.YAMLError as e:
+                print(f"Error processing YAML file: {str(e)}")
                 return dash.no_update, dash.no_update, dash.no_update
         return dash.no_update, dash.no_update, dash.no_update
 
@@ -230,11 +231,11 @@ def register_node_callbacks(app):
         prevent_initial_call=True,
     )
     def update_node_type(new_type, node_data, elements, log_message):
-        if node_data:
+        if node_data and new_type:
             node_id = node_data["id"]
             updated_elements = []
             for element in elements:
-                if element.get("data") and element["data"].get("id") == node_id:
+                if element.get("data") and element["data"].get("id") == node_id and new_type != node_data["type"]:
                     element["data"]["type"] = new_type
                     element["data"]["config"] = {}  # Reset config to empty
                 updated_elements.append(element)
