@@ -1,7 +1,7 @@
 # third party libraries
 import dash_cytoscape as cyto
 import dash_resizable_panels as drp
-from dash import dash_table, html
+from dash import dash_table, dcc, html
 
 
 def get_stylesheet():
@@ -152,28 +152,41 @@ def create_middle_panel():
                     drp.Panel(
                         html.Div(
                             [
-                                dash_table.DataTable(
-                                    id="graph-log-table",
-                                    columns=[
-                                        {"name": "Timestamp", "id": "Timestamp"},
-                                        {"name": "Log Message", "id": "Log Message"},
+                                dcc.Loading(
+                                    id="graph-log-table-loading",
+                                    type="default",
+                                    color="#FF6F20",
+                                    children=[
+                                        dash_table.DataTable(
+                                            id="graph-log-table",
+                                            columns=[
+                                                {
+                                                    "name": "Timestamp",
+                                                    "id": "Timestamp",
+                                                },
+                                                {
+                                                    "name": "Log Message",
+                                                    "id": "Log Message",
+                                                },
+                                            ],
+                                            style_table={
+                                                "width": "100%",
+                                                "height": "calc(15vh)",
+                                                "overflowY": "auto",
+                                                "overflowX": "auto",
+                                            },
+                                            style_data={
+                                                "whiteSpace": "normal",
+                                                "height": "auto",
+                                                "textAlign": "left",
+                                                "fontFamily": "monospace",
+                                                "fontSize": "15px",
+                                                "border": "1px solid #B0B0B0",
+                                            },
+                                            style_cell={"padding": "5px"},
+                                            sort_action="native",
+                                        )
                                     ],
-                                    style_table={
-                                        "width": "100%",
-                                        "height": "calc(15vh)",
-                                        "overflowY": "auto",
-                                        "overflowX": "auto",
-                                    },
-                                    style_data={
-                                        "whiteSpace": "normal",
-                                        "height": "auto",
-                                        "textAlign": "left",
-                                        "fontFamily": "monospace",
-                                        "fontSize": "15px",
-                                        "border": "1px solid #B0B0B0",
-                                    },
-                                    style_cell={"padding": "5px"},
-                                    sort_action="native",
                                 ),
                                 html.Div(
                                     [
