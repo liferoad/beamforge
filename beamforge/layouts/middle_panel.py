@@ -171,7 +171,7 @@ def create_middle_panel():
                                             ],
                                             style_table={
                                                 "width": "100%",
-                                                "height": "calc(15vh)",
+                                                "maxHeight": "20vh",
                                                 "overflowY": "auto",
                                                 "overflowX": "auto",
                                             },
@@ -212,20 +212,6 @@ def create_middle_panel():
                                             ],
                                         )
                                     ],
-                                ),
-                                html.Div(
-                                    [
-                                        html.Button(
-                                            "Clear Logs",
-                                            id="clear-graph-logs",
-                                            n_clicks=0,
-                                            className="beam-button",
-                                        ),
-                                    ],
-                                    style={
-                                        "textAlign": "center",
-                                        "marginTop": "auto",
-                                    },
                                 ),
                             ]
                         ),

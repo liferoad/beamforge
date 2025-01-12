@@ -103,18 +103,29 @@ def create_right_panel():
                     ),
                     html.Div(
                         [
-                            html.Button(
-                                "Run Pipeline",
-                                id="run-pipeline-button",
-                                className="beam-button",
+                            html.Div(
+                                [
+                                    html.Button(
+                                        "Run Pipeline",
+                                        id="run-pipeline-button",
+                                        className="beam-button",
+                                        style={
+                                            "marginRight": "10px",
+                                        },
+                                    ),
+                                    html.Button(
+                                        "Clear Logs",
+                                        id="clear-graph-logs",
+                                        className="beam-button",
+                                    ),
+                                ],
                                 style={
+                                    "display": "flex",
+                                    "justifyContent": "center",
                                     "marginTop": "10px",
                                 },
                             ),
-                        ],
-                        style={
-                            "textAlign": "center",
-                        },
+                        ]
                     ),
                 ]
             ),
