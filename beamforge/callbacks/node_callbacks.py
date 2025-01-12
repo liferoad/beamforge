@@ -14,7 +14,7 @@ import yaml
 from dash import Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 
-from beamforge.utils.graph_utils import format_log_with_timestamp, generate_yaml_content
+from beamforge.utils.graph_utils import custom_yaml_dump, format_log_with_timestamp, generate_yaml_content
 from beamforge.utils.transform_parser import BEAM_YAML_TRANSFORMS
 
 
@@ -163,7 +163,7 @@ def register_node_callbacks(app):
                         html.H6("Configuration:"),
                         DashAceEditor(
                             id="node-config-editor",
-                            value=yaml.dump(node_data["config"], indent=2),
+                            value=custom_yaml_dump(node_data["config"]),
                             style={"height": "200px"},
                             theme="tomorrow",
                             mode="yaml",
@@ -261,7 +261,7 @@ def register_node_callbacks(app):
     )
     def update_node_config_and_usage(new_type, node_data):
         if node_data:
-            return yaml.dump({}, indent=2), BEAM_YAML_TRANSFORMS[new_type]
+            return custom_yaml_dump({}), BEAM_YAML_TRANSFORMS[new_type]
         return dash.no_update, dash.no_update
 
     @app.callback(

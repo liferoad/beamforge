@@ -5,7 +5,7 @@ import base64
 import yaml
 from dash import Input, Output, State
 
-from beamforge.utils.graph_utils import generate_yaml_content
+from beamforge.utils.graph_utils import custom_yaml_dump, generate_yaml_content
 
 
 def register_yaml_callbacks(app):
@@ -23,7 +23,7 @@ def register_yaml_callbacks(app):
 
         try:
             yaml_dict = yaml.safe_load(decoded)
-            formatted_yaml = yaml.dump(yaml_dict, default_flow_style=False, sort_keys=False)
+            formatted_yaml = custom_yaml_dump(yaml_dict)
             return formatted_yaml
         except Exception as e:
             return f"Error processing YAML file: {str(e)}"

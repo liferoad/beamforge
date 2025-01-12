@@ -6,6 +6,25 @@ from datetime import datetime
 import yaml
 
 
+def custom_yaml_dump(data):
+    """
+    Wrapper for yaml.dump with specific parameters.
+
+    Args:
+        data: The data to be dumped.
+
+    Returns:
+        The YAML string representation of the data.
+    """
+    return yaml.dump(
+        data,
+        indent=2,
+        default_flow_style=False,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+
+
 def generate_yaml_content(elements):
     yaml_data = {"pipeline": {}}
     nodes_data = {}
@@ -31,7 +50,7 @@ def generate_yaml_content(elements):
 
     yaml_data["pipeline"]["transforms"] = list(nodes_data.values())
 
-    yaml_string = yaml.dump(yaml_data, default_flow_style=False, sort_keys=False)
+    yaml_string = custom_yaml_dump(yaml_data)
     return yaml_string
 
 
