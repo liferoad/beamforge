@@ -136,7 +136,7 @@ def create_middle_panel():
                                             "width": "100%",
                                             "height": "calc(75vh)",
                                             "borderRadius": "4px",
-                                            "backgroundColor": "#F5F5F5",
+                                            "backgroundColor": "white",
                                         },
                                         stylesheet=get_stylesheet(),
                                         elements=[],
