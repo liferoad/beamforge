@@ -3,24 +3,23 @@ body {
 }
 
 .panel-resize-handle {
-    background-color: #ccc;
+    background-color: #f7a75b;
     width: 2px;
     transition: background-color 0.2s;
 }
 
 .panel-resize-handle:hover {
-    background-color: #999;
+    background-color: #FF6F20;
     width: 3px;
 }
 
 .resize-handle-vertical {
-    width: 100%;
     height: 2px;
-    background-color: #ccc;
+    background-color: #f7a75b;
 }
 .resize-handle-vertical:hover {
-    background-color: #999;
-    width: 3px;
+    background-color: #FF6F20;
+    height: 3px;
 }
 
 .panel-group {
