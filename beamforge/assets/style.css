@@ -50,3 +50,7 @@ body {
     background-color: gray;
     color: white;
   }
+
+#graph-log-table th {
+    text-align: center;
+}

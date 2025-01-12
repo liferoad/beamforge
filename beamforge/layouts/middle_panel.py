@@ -179,12 +179,37 @@ def create_middle_panel():
                                                 "whiteSpace": "normal",
                                                 "height": "auto",
                                                 "textAlign": "left",
-                                                "fontFamily": "monospace",
+                                                "fontFamily": "Roboto, sans-serif",
                                                 "fontSize": "15px",
-                                                "border": "1px solid #B0B0B0",
+                                                "border": "0px solid #B0B0B0",
                                             },
-                                            style_cell={"padding": "5px"},
+                                            style_cell={
+                                                "padding": "5px",
+                                                "width": "180px",
+                                            },
+                                            style_data_conditional=[
+                                                {
+                                                    "if": {"row_index": "odd"},
+                                                    "backgroundColor": "rgb(240, 240, 240)",
+                                                },
+                                            ],
+                                            style_cell_conditional=[
+                                                {
+                                                    "if": {"column_id": "Timestamp"},
+                                                    "width": "200px",
+                                                },
+                                                {
+                                                    "if": {"column_id": "Log Message"},
+                                                    "width": "auto",
+                                                },
+                                            ],
                                             sort_action="native",
+                                            sort_by=[
+                                                {
+                                                    "column_id": "Timestamp",
+                                                    "direction": "desc",
+                                                }
+                                            ],
                                         )
                                     ],
                                 ),
