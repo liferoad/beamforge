@@ -1,8 +1,7 @@
 # third party libraries
-import dash_bootstrap_components as dbc
 import dash_cytoscape as cyto
 import dash_resizable_panels as drp
-from dash import dcc, html
+from dash import dash_table, html
 
 
 def get_stylesheet():
@@ -153,24 +152,28 @@ def create_middle_panel():
                     drp.Panel(
                         html.Div(
                             [
-                                dcc.Loading(
-                                    [
-                                        dcc.Markdown(
-                                            id="graph-log",
-                                            children="",
-                                            style={
-                                                "width": "100%",
-                                                "height": "calc(15vh)",
-                                                "textAlign": "left",
-                                                "overflow": "auto",
-                                                "fontFamily": "monospace",
-                                                "fontSize": "15px",
-                                                "border": "1px",
-                                            },
-                                        ),
+                                dash_table.DataTable(
+                                    id="graph-log-table",
+                                    columns=[
+                                        {"name": "Timestamp", "id": "Timestamp"},
+                                        {"name": "Log Message", "id": "Log Message"},
                                     ],
-                                    overlay_style={"visibility": "visible", "opacity": 0.5, "backgroundColor": "white"},
-                                    custom_spinner=html.H2(["Loading...", dbc.Spinner(color="#FF6F20")]),
+                                    style_table={
+                                        "width": "100%",
+                                        "height": "calc(15vh)",
+                                        "overflowY": "auto",
+                                        "overflowX": "auto",
+                                    },
+                                    style_data={
+                                        "whiteSpace": "normal",
+                                        "height": "auto",
+                                        "textAlign": "left",
+                                        "fontFamily": "monospace",
+                                        "fontSize": "15px",
+                                        "border": "1px solid #B0B0B0",
+                                    },
+                                    style_cell={"padding": "5px"},
+                                    sort_action="native",
                                 ),
                                 html.Div(
                                     [

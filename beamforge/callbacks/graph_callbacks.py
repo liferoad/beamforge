@@ -84,21 +84,6 @@ def register_graph_callbacks(app):
         return zoom_level
 
     @app.callback(
-        Output("graph-log", "children"),
-        Input("network-graph", "tapNode"),
-        Input("network-graph", "tapEdge"),
-        Input("graph-log", "children"),
-        # Add other inputs as needed for more interactions
-    )
-    def update_log(tapNode, tapEdge, log_message):
-        # if tapEdge:
-        #     log_message += "Edge tapped: %s -> %s\n" % (tapEdge["data"]["source"], tapEdge["data"]["target"])
-        # elif tapNode:
-        #     log_message += "Node tapped: %s\n" % tapNode["data"]["id"]
-
-        return format_log_with_timestamp(log_message)
-
-    @app.callback(
         Output("delete-selected", "disabled"),
         Input("network-graph", "selectedNodeData"),
         Input("network-graph", "selectedEdgeData"),
@@ -108,16 +93,16 @@ def register_graph_callbacks(app):
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
-        Output("graph-log", "children", allow_duplicate=True),
+        Output("graph-log-table", "data", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Input("delete-selected", "n_clicks"),
         State("network-graph", "elements"),
         State("network-graph", "selectedNodeData"),
         State("network-graph", "selectedEdgeData"),
-        State("graph-log", "children"),
+        State("graph-log-table", "data"),
         prevent_initial_call=True,
     )
-    def remove_selected_elements(n_clicks, elements, selected_nodes, selected_edges, log_message):
+    def remove_selected_elements(n_clicks, elements, selected_nodes, selected_edges, table_data):
         if n_clicks > 0:
             node_ids_to_remove = {node["id"] for node in selected_nodes} if selected_nodes else set()
             edge_ids_to_remove = (
@@ -129,15 +114,19 @@ def register_graph_callbacks(app):
                 ["(%s, %s)" % (edge["source"], edge["target"]) for edge in selected_edges] if selected_edges else []
             )
 
+            formatted_logs = []
             if deleted_nodes:
-                log_message += "Deleted nodes: %s\n" % ", ".join(deleted_nodes)
+                formatted_logs.extend(format_log_with_timestamp("Deleted nodes: %s\n" % ", ".join(deleted_nodes)))
             if deleted_edges:
-                log_message += "Deleted edges: %s\n" % ", ".join(deleted_edges)
+                formatted_logs.extend(format_log_with_timestamp("Deleted edges: %s\n" % ", ".join(deleted_edges)))
 
             new_elements = []
             for element in elements:
                 if "source" in element["data"]:  # It's an edge
-                    if (element["data"]["source"], element["data"]["target"]) not in edge_ids_to_remove and (
+                    if (
+                        element["data"]["source"],
+                        element["data"]["target"],
+                    ) not in edge_ids_to_remove and (
                         element["data"]["target"],
                         element["data"]["source"],
                     ) not in edge_ids_to_remove:
@@ -149,29 +138,33 @@ def register_graph_callbacks(app):
             # Generate YAML content
             yaml_string = generate_yaml_content(new_elements)
 
-            return new_elements, format_log_with_timestamp(log_message), yaml_string
-        return elements, format_log_with_timestamp(log_message), dash.no_update
+            return new_elements, table_data + formatted_logs, yaml_string
+        return elements, table_data, dash.no_update
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
-        Output("graph-log", "children", allow_duplicate=True),
+        Output("graph-log-table", "data", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Input("add-node-button", "n_clicks"),
         State("network-graph", "elements"),
-        State("graph-log", "children"),
+        State("graph-log-table", "data"),
         prevent_initial_call=True,
     )
-    def add_new_node(n_clicks, elements, log_message):
+    def add_new_node(n_clicks, elements, table_data):
         if n_clicks > 0:
+            # Initialize table_data as an empty list if it's None
+            if table_data is None:
+                table_data = []
+
             new_node_id = "node-%s" % (len([el for el in elements if "source" not in el["data"]]) + 1)
-            elements = elements + [{"data": {"id": new_node_id, "type": "UNKNOWN", "config": {}}}]
-            log_message += "Added node: %s\n" % new_node_id
+            new_node = {"data": {"id": new_node_id, "type": "UNKNOWN", "config": {}}}
+            elements.append(new_node)
+            formatted_logs = format_log_with_timestamp(f"Added node: {new_node_id}\n")
 
-            # Generate YAML content
             yaml_string = generate_yaml_content(elements)
+            return elements, table_data + formatted_logs, yaml_string
 
-            return elements, format_log_with_timestamp(log_message), yaml_string
-        return elements, format_log_with_timestamp(log_message), dash.no_update
+        return elements, table_data, dash.no_update
 
     @app.callback(
         Output("add-edge-button", "disabled"),
@@ -182,15 +175,16 @@ def register_graph_callbacks(app):
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
-        Output("graph-log", "children", allow_duplicate=True),
+        Output("graph-log-table", "data", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Input("add-edge-button", "n_clicks"),
         State("network-graph", "elements"),
         State("network-graph", "selectedNodeData"),
-        State("graph-log", "children"),
+        State("graph-log-table", "data"),
+        State("yaml-content", "value"),
         prevent_initial_call=True,
     )
-    def add_edge_between_nodes(n_clicks, elements, selected_nodes, log_message):
+    def add_edge_between_nodes(n_clicks, elements, selected_nodes, table_data, yaml_string):
         if n_clicks > 0 and selected_nodes and len(selected_nodes) == 2:
             source_id = selected_nodes[0]["id"]
             target_id = selected_nodes[1]["id"]
@@ -206,12 +200,11 @@ def register_graph_callbacks(app):
             if not edge_exists:
                 new_edge = {"data": {"source": source_id, "target": target_id}}
                 elements.append(new_edge)
-                log_message += "Added edge between %s and %s\n" % (source_id, target_id)
+                formatted_logs = format_log_with_timestamp(f"Added edge between {source_id} and {target_id}\n")
             else:
-                log_message += "Edge already exists between %s and %s\n" % (source_id, target_id)
+                formatted_logs = format_log_with_timestamp(f"Edge already exists between {source_id} and {target_id}\n")
 
-            # Generate YAML content
             yaml_string = generate_yaml_content(elements)
+            return elements, table_data + formatted_logs, yaml_string
 
-            return elements, format_log_with_timestamp(log_message), yaml_string
-        return elements, format_log_with_timestamp(log_message), dash.no_update
+        return elements, table_data, dash.no_update

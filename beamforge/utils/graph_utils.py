@@ -37,27 +37,24 @@ def generate_yaml_content(elements):
 
 def format_log_with_timestamp(log_message):
     if not log_message:
-        return ""
+        return []
 
-    formatted_logs = []
+    table_data = []
     for log in log_message.splitlines():
-        if not log.startswith("**"):  # Check if it already has a timestamp
-            timestamp = datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")
-            log = f"**`{timestamp}`**: {log}  "
-        formatted_logs.append(log)
+        match = re.search(r"\*\*`\[(.*?)\]`\*\*", log)
+        if match:
+            timestamp = match.group(1)
+            message = log[match.end() :].strip()
+        else:
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            message = log
+
+        table_data.append({"Timestamp": timestamp, "Log Message": message})
 
     # Sort logs by timestamp (latest to oldest)
-    formatted_logs = sorted(
-        formatted_logs,
-        key=lambda log: (
-            datetime.strptime(
-                re.search(r"\*\*`\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]`\*\*", log).group(0)[4:23],
-                "%Y-%m-%d %H:%M:%S",
-            )
-            if re.search(r"\*\*`\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\]`\*\*", log)
-            else datetime.min
-        ),
+    table_data.sort(
+        key=lambda item: datetime.strptime(item["Timestamp"], "%Y-%m-%d %H:%M:%S"),
         reverse=True,
     )
 
-    return "\n".join(formatted_logs) + "\n"
+    return table_data

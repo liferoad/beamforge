@@ -195,14 +195,14 @@ def register_node_callbacks(app):
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
-        Output("graph-log", "children", allow_duplicate=True),
+        Output("graph-log-table", "data", allow_duplicate=True),
         Input("node-config-editor", "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
-        State("graph-log", "children"),
+        State("graph-log-table", "data"),
         prevent_initial_call=True,
     )
-    def save_node_config(config_value, node_data, elements, log_message):
+    def save_node_config(config_value, node_data, elements, table_data):
         if node_data and config_value:
             try:
                 new_config = yaml.safe_load(config_value)
@@ -213,8 +213,10 @@ def register_node_callbacks(app):
                         element["data"]["config"] = new_config
                     updated_elements.append(element)
                 yaml_content = generate_yaml_content(updated_elements)
-                log_message += f"Updated config for node '{node_data['id']}'\n"
-                return updated_elements, yaml_content, format_log_with_timestamp(log_message)
+                formatted_logs = format_log_with_timestamp(f"Updated config for node '{node_data['id']}'\n")
+                if table_data is None:
+                    table_data = []
+                return updated_elements, yaml_content, table_data + formatted_logs
             except yaml.YAMLError as e:
                 print(f"Error processing YAML file: {str(e)}")
                 return dash.no_update, dash.no_update, dash.no_update
@@ -223,14 +225,14 @@ def register_node_callbacks(app):
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
-        Output("graph-log", "children", allow_duplicate=True),
+        Output("graph-log-table", "data", allow_duplicate=True),
         Input("node-type-dropdown", "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
-        State("graph-log", "children"),
+        State("graph-log-table", "data"),
         prevent_initial_call=True,
     )
-    def update_node_type(new_type, node_data, elements, log_message):
+    def update_node_type(new_type, node_data, elements, table_data):
         if node_data and new_type:
             node_id = node_data["id"]
             updated_elements = []
@@ -240,11 +242,13 @@ def register_node_callbacks(app):
                     element["data"]["config"] = {}  # Reset config to empty
                 updated_elements.append(element)
             yaml_content = generate_yaml_content(updated_elements)
-            log_message += f"Changed type of node '{node_data['id']}' to '{new_type}'"
+            formatted_logs = format_log_with_timestamp(f"Changed type of node '{node_data['id']}' to '{new_type}'")
+            if table_data is None:
+                table_data = []
             return (
                 updated_elements,
                 yaml_content,
-                format_log_with_timestamp(log_message),
+                table_data + formatted_logs,
             )
         return dash.no_update, dash.no_update, dash.no_update
 
@@ -264,17 +268,19 @@ def register_node_callbacks(app):
         Output("network-graph", "elements", allow_duplicate=True),
         Output("network-graph", "tapNodeData", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
-        Output("graph-log", "children", allow_duplicate=True),
+        Output("graph-log-table", "data", allow_duplicate=True),
         Input("node-id-input", "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
-        State("graph-log", "children"),
+        State("graph-log-table", "data"),
         prevent_initial_call=True,
     )
-    def update_node_id(new_node_id, node_data, elements, log_message):
+    def update_node_id(new_node_id, node_data, elements, table_data):
         if len(new_node_id) == 0:
-            log_message += "Node ID cannot be empty\n"
-            return dash.no_update, dash.no_update, dash.no_update, format_log_with_timestamp(log_message)
+            formatted_logs = format_log_with_timestamp("Node ID cannot be empty\n")
+            if table_data is None:
+                table_data = []
+            return dash.no_update, dash.no_update, dash.no_update, table_data + formatted_logs
         if node_data and node_data["id"] != new_node_id:
             old_node_id = node_data["id"]
             updated_elements = []
@@ -290,8 +296,10 @@ def register_node_callbacks(app):
                     element["data"]["id"] = None
                 updated_elements.append(element)
             yaml_content = generate_yaml_content(updated_elements)
-            log_message += f"Renamed node from '{node_data['id']}' to '{new_node_id}'\n"
-            return updated_elements, node_data, yaml_content, format_log_with_timestamp(log_message)
+            formatted_logs = format_log_with_timestamp(f"Renamed node from '{node_data['id']}' to '{new_node_id}'\n")
+            if table_data is None:
+                table_data = []
+            return updated_elements, node_data, yaml_content, table_data + formatted_logs
         return dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
     @app.callback(
@@ -305,23 +313,26 @@ def register_node_callbacks(app):
             return True  # Disable after click
 
     @app.callback(
-        Output("graph-log", "children", allow_duplicate=True),
+        Output("graph-log-table", "data", allow_duplicate=True),
         Output("run-pipeline-button", "disabled", allow_duplicate=True),
         Input("run-pipeline-button", "n_clicks"),
         State("pipeline-runner-dropdown", "value"),
         State("pipeline-options-input", "value"),
         State("yaml-content", "value"),
-        State("graph-log", "children"),
+        State("graph-log-table", "data"),
         prevent_initial_call=True,
     )
-    def run_beam_pipeline(n_clicks, runner, pipeline_options, yaml_content, log_message):
+    def run_beam_pipeline(n_clicks, runner, pipeline_options, yaml_content, table_data):
         if n_clicks is None:
             return dash.no_update, dash.no_update
 
-        return _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message), False
+        formatted_logs = _run_beam_pipeline(runner, pipeline_options, yaml_content, "")
+        if table_data is None:
+            table_data = []
+        return table_data + formatted_logs, False
 
     @app.callback(
-        Output("graph-log", "children", allow_duplicate=True),
+        Output("graph-log-table", "data", allow_duplicate=True),
         Input("clear-graph-logs", "n_clicks"),
         prevent_initial_call=True,
     )
@@ -329,4 +340,4 @@ def register_node_callbacks(app):
         if n_clicks is None:
             return dash.no_update
         else:
-            return ""
+            return []
