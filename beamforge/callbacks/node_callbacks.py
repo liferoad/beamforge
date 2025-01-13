@@ -10,8 +10,7 @@ import tempfile
 # third party libraries
 import dash
 import dash_bootstrap_components as dbc
-import yaml
-from dash import Input, Output, State, dcc, html
+from dash import ALL, Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 
 from beamforge.utils.graph_utils import custom_yaml_dump, format_log_with_timestamp, generate_yaml_content
@@ -158,19 +157,11 @@ def register_node_callbacks(app):
                     ],
                     style={"margin-bottom": "10px"},
                 ),
-                dbc.Row(
-                    [
-                        html.H6("Configuration:"),
-                        DashAceEditor(
-                            id="node-config-editor",
-                            value=custom_yaml_dump(node_data["config"]),
-                            style={"height": "200px"},
-                            theme="tomorrow",
-                            mode="yaml",
-                            maxLines=5000,
-                        ),
+                html.Div(
+                    id="node-config-container",
+                    children=[
+                        # Configuration rows will be added here
                     ],
-                    style={"margin-bottom": "10px"},
                 ),
                 dbc.Row(
                     [
@@ -186,6 +177,8 @@ def register_node_callbacks(app):
                     ],
                     style={"margin-bottom": "5px"},
                 ),
+                # Add dcc.Store to store node config data
+                dcc.Store(id="node-config-data"),
             ],
             fluid=True,
         )
@@ -193,34 +186,75 @@ def register_node_callbacks(app):
         return html.Div(details)
 
     @app.callback(
+        Output("node-config-container", "children"),
+        Input("network-graph", "tapNodeData"),
+    )
+    def update_node_config_display(node_data):
+        if not node_data:
+            return []
+
+        config = node_data.get("config", {})
+        formatted_config = custom_yaml_dump(config)
+        config_lines = formatted_config.strip().split("\n")
+
+        config_rows = [html.H6("Configuration:")]
+        for line in config_lines:
+            if ":" in line:
+                key, value = line.split(":", 1)
+                key = key.strip()
+                value = value.strip()
+
+                config_rows.append(
+                    dbc.Row(
+                        [
+                            dbc.Col(html.Label(key + ":"), width=4),
+                            dbc.Col(
+                                dcc.Input(
+                                    value=value,
+                                    type="text",
+                                    style={"width": "100%"},
+                                    id={"type": "node-config-input", "index": key},
+                                ),
+                                width=8,
+                            ),
+                        ],
+                        style={"margin-bottom": "5px"},
+                    )
+                )
+        return config_rows
+
+    @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Output("graph-log-table", "data", allow_duplicate=True),
-        Input("node-config-editor", "value"),
+        Input({"type": "node-config-input", "index": ALL}, "value"),
         State("network-graph", "tapNodeData"),
         State("network-graph", "elements"),
         State("graph-log-table", "data"),
         prevent_initial_call=True,
     )
-    def save_node_config(config_value, node_data, elements, table_data):
-        if node_data and config_value:
-            try:
-                new_config = yaml.safe_load(config_value)
-                node_id = node_data["id"]
-                updated_elements = []
-                for element in elements:
-                    if element.get("data") and element["data"].get("id") == node_id and new_config != {}:
-                        element["data"]["config"] = new_config
-                    updated_elements.append(element)
-                yaml_content = generate_yaml_content(updated_elements)
-                formatted_logs = format_log_with_timestamp(f"Updated config for node '{node_data['id']}'\n")
-                if table_data is None:
-                    table_data = []
-                return updated_elements, yaml_content, table_data + formatted_logs
-            except yaml.YAMLError as e:
-                print(f"Error processing YAML file: {str(e)}")
-                return dash.no_update, dash.no_update, dash.no_update
-        return dash.no_update, dash.no_update, dash.no_update
+    def update_node_config(config_values, node_data, elements, table_data):
+        if not node_data or not config_values:
+            return dash.no_update, dash.no_update, dash.no_update
+
+        node_id = node_data["id"]
+        config_keys = [key["id"]["index"] for key in dash.ctx.inputs_list[0]]
+
+        updated_elements = []
+        for element in elements:
+            if element.get("data") and element["data"].get("id") == node_id:
+                config = {}
+                for key, value in zip(config_keys, config_values):
+                    config[key] = value
+                element["data"]["config"] = config
+            updated_elements.append(element)
+
+        yaml_content = generate_yaml_content(updated_elements)
+        formatted_logs = format_log_with_timestamp(f"Updated config of node '{node_id}'")
+        if table_data is None:
+            table_data = []
+
+        return updated_elements, yaml_content, table_data + formatted_logs
 
     @app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
