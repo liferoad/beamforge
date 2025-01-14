@@ -10,6 +10,7 @@ import tempfile
 # third party libraries
 import dash
 import dash_bootstrap_components as dbc
+import yaml
 from dash import ALL, Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 
@@ -118,99 +119,125 @@ def _run_beam_pipeline(runner, pipeline_options, yaml_content, log_message):
     return format_log_with_timestamp(log_message)
 
 
-def register_node_callbacks(app):
-    @app.callback(Output("node-data", "children"), Input("network-graph", "tapNodeData"))
-    def display_node_data(node_data):
-        if not node_data:
-            return "Click a node to see its details"
+def _display_node_data_callback(node_data):
+    if not node_data:
+        return "Click a node to see its details"
 
-        # Create a formatted display of node data using dbc.Card with a custom background color
-        details = dbc.Container(
-            [
-                dbc.Row(
-                    [
-                        dbc.Col(html.H6("Name:"), width=4),
-                        dbc.Col(
-                            dcc.Input(
-                                id="node-id-input",
-                                value=node_data["id"],
-                                type="text",
-                                style={"border": "1px solid #ced4da", "fontSize": "14px"},
-                            ),
-                            width=8,
+    # Create a formatted display of node data using dbc.Card with a custom background color
+    details = dbc.Container(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(html.H6("Name:"), width=4),
+                    dbc.Col(
+                        dcc.Input(
+                            id="node-id-input",
+                            value=node_data["id"],
+                            type="text",
+                            style={"border": "1px solid #ced4da", "fontSize": "14px"},
                         ),
-                    ],
-                    style={"margin-bottom": "10px"},
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.H6("Type:"), width=4),
-                        dbc.Col(
-                            dcc.Dropdown(
-                                id="node-type-dropdown",
-                                options=get_node_type_options(),
-                                value=node_data["type"],
-                                style={"border": "1px solid #ced4da", "fontSize": "14px"},
-                            ),
-                            width=8,
+                        width=8,
+                    ),
+                ],
+                style={"margin-bottom": "10px"},
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(html.H6("Type:"), width=4),
+                    dbc.Col(
+                        dcc.Dropdown(
+                            id="node-type-dropdown",
+                            options=get_node_type_options(),
+                            value=node_data["type"],
+                            style={"border": "1px solid #ced4da", "fontSize": "14px"},
                         ),
-                    ],
-                    style={"margin-bottom": "10px"},
-                ),
-                html.Div(
-                    id="node-config-container",
-                    children=[
-                        # Configuration rows will be added here
-                    ],
-                ),
-                dbc.Row(
-                    [
-                        html.H6("Usage/Example:"),
-                        DashAceEditor(
-                            id="node-config-usage",
-                            value=BEAM_YAML_TRANSFORMS[node_data["type"]],
-                            maxLines=5000,
-                            theme="tomorrow",
-                            readOnly=True,
-                            mode="yaml",
-                        ),
-                    ],
-                    style={"margin-bottom": "5px"},
-                ),
-                # Add dcc.Store to store node config data
-                dcc.Store(id="node-config-data"),
-            ],
-            fluid=True,
-        )
-
-        return html.Div(details)
-
-    @app.callback(
-        Output("node-config-container", "children"),
-        Input("network-graph", "tapNodeData"),
+                        width=8,
+                    ),
+                ],
+                style={"margin-bottom": "10px"},
+            ),
+            html.Div(
+                id="node-config-container",
+                children=[
+                    # Configuration rows will be added here
+                ],
+            ),
+            dbc.Row(
+                [
+                    html.H6("Usage Example:"),
+                    DashAceEditor(
+                        id="node-config-usage",
+                        value=BEAM_YAML_TRANSFORMS[node_data["type"]],
+                        maxLines=5000,
+                        theme="tomorrow",
+                        readOnly=True,
+                        mode="yaml",
+                    ),
+                ],
+                style={"margin-bottom": "5px"},
+            ),
+            # Add dcc.Store to store node config data
+            dcc.Store(id="node-config-data"),
+        ],
+        fluid=True,
     )
-    def update_node_config_display(node_data):
-        if not node_data:
-            return []
 
+    return html.Div(details)
+
+
+def _update_node_config_display_callback(node_data, new_type):
+    if not node_data and not new_type:
+        return [], ""
+
+    if new_type and node_data.get("type", {}) != new_type:
+        config = yaml.safe_load(BEAM_YAML_TRANSFORMS[new_type]).get("config", {})
+    else:
         config = node_data.get("config", {})
-        formatted_config = custom_yaml_dump(config)
-        config_lines = formatted_config.strip().split("\n")
+        if not config:
+            node_type = node_data.get("type", {})
+            if node_type != "UNKNOWN":
+                config = yaml.safe_load(BEAM_YAML_TRANSFORMS[node_type]).get("config", {})
 
+    formatted_config = custom_yaml_dump(config)
+    config_lines = formatted_config.strip().split("\n")
+
+    has_config = False
+    for line in config_lines:
+        if ":" in line:
+            has_config = True
+            break
+    if not has_config or not config:
+        config_rows = [html.H6("No Configuration.")]
+    else:
         config_rows = [html.H6("Configuration:")]
-        for line in config_lines:
-            if ":" in line:
-                key, value = line.split(":", 1)
-                key = key.strip()
-                value = value.strip()
-
+        for key, value in config.items():
+            if isinstance(value, dict):
+                for sub_key, sub_value in value.items():
+                    config_rows.append(
+                        dbc.Row(
+                            [
+                                dbc.Col(html.Label(f"{sub_key}:"), width=4),
+                                dbc.Col(
+                                    dcc.Input(
+                                        value=str(sub_value),
+                                        type="text",
+                                        style={"width": "100%"},
+                                        id={"type": "node-config-input", "index": sub_key},
+                                    ),
+                                    width=8,
+                                ),
+                            ],
+                            style={"margin-bottom": "5px"},
+                        )
+                    )
+            else:
                 config_rows.append(
                     dbc.Row(
                         [
-                            dbc.Col(html.Label(key + ":"), width=4),
+                            dbc.Col(html.Label(f"{key}:"), width=4),
                             dbc.Col(
                                 dcc.Input(
-                                    value=value,
+                                    value=str(value),
                                     type="text",
                                     style={"width": "100%"},
                                     id={"type": "node-config-input", "index": key},
@@ -221,9 +248,123 @@ def register_node_callbacks(app):
                         style={"margin-bottom": "5px"},
                     )
                 )
-        return config_rows
 
-    @app.callback(
+    return config_rows, BEAM_YAML_TRANSFORMS[new_type]
+
+
+def _update_node_config_callback(config_values, node_data, elements, table_data):
+    if not node_data or not config_values:
+        return dash.no_update, dash.no_update, dash.no_update
+
+    node_id = node_data["id"]
+    config_keys = [key["id"]["index"] for key in dash.ctx.inputs_list[0]]
+
+    updated_elements = []
+    for element in elements:
+        if element.get("data") and element["data"].get("id") == node_id:
+            config = {}
+            for key, value in zip(config_keys, config_values):
+                config[key] = value
+            element["data"]["config"] = config
+        updated_elements.append(element)
+
+    yaml_content = generate_yaml_content(updated_elements)
+    formatted_logs = format_log_with_timestamp(f"Updated config of node '{node_id}'")
+    if table_data is None:
+        table_data = []
+
+    return updated_elements, yaml_content, table_data + formatted_logs
+
+
+def _update_node_type_callback(new_type, node_data, elements, table_data):
+    if node_data and new_type:
+        node_id = node_data["id"]
+        updated_elements = []
+        for element in elements:
+            if element.get("data") and element["data"].get("id") == node_id and new_type != node_data["type"]:
+                element["data"]["type"] = new_type
+                element["data"]["config"] = {}  # Reset config to empty
+            updated_elements.append(element)
+        yaml_content = generate_yaml_content(updated_elements)
+        formatted_logs = format_log_with_timestamp(f"Changed type of node '{node_data['id']}' to '{new_type}'")
+        if table_data is None:
+            table_data = []
+        return (
+            updated_elements,
+            yaml_content,
+            table_data + formatted_logs,
+        )
+    return dash.no_update, dash.no_update, dash.no_update
+
+
+def _update_tap_node_data_callback(new_type, node_data):
+    if node_data and new_type:
+        node_data["type"] = new_type
+    return node_data
+
+
+def _update_node_id_callback(new_node_id, node_data, elements, table_data):
+    if len(new_node_id) == 0:
+        formatted_logs = format_log_with_timestamp("Node ID cannot be empty\n")
+        if table_data is None:
+            table_data = []
+        return dash.no_update, dash.no_update, dash.no_update, table_data + formatted_logs
+    if node_data and node_data["id"] != new_node_id:
+        old_node_id = node_data["id"]
+        updated_elements = []
+        for element in elements:
+            if element.get("data") and element["data"].get("id") == old_node_id:
+                element["data"]["id"] = new_node_id
+                node_data = element["data"]
+            elif element.get("data") and element["data"].get("source") == old_node_id:
+                element["data"]["source"] = new_node_id
+                element["data"]["id"] = None
+            elif element.get("data") and element["data"].get("target") == old_node_id:
+                element["data"]["target"] = new_node_id
+                element["data"]["id"] = None
+            updated_elements.append(element)
+        yaml_content = generate_yaml_content(updated_elements)
+        formatted_logs = format_log_with_timestamp(f"Renamed node from '{node_data['id']}' to '{new_node_id}'\n")
+        if table_data is None:
+            table_data = []
+        return updated_elements, node_data, yaml_content, table_data + formatted_logs
+    return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+
+
+def _disable_run_pipeline_button_callback(n_clicks):
+    if n_clicks is None:
+        return False  # Button starts enabled
+    else:
+        return True  # Disable after click
+
+
+def _run_beam_pipeline_callback(n_clicks, runner, pipeline_options, yaml_content, table_data):
+    if n_clicks is None:
+        return dash.no_update, dash.no_update
+
+    formatted_logs = _run_beam_pipeline(runner, pipeline_options, yaml_content, "")
+    if table_data is None:
+        table_data = []
+    return table_data + formatted_logs, False
+
+
+def _clear_graph_logs_callback(n_clicks):
+    if n_clicks is None:
+        return dash.no_update
+    else:
+        return []
+
+
+def register_node_callbacks(app):
+    app.callback(Output("node-data", "children"), Input("network-graph", "tapNodeData"))(_display_node_data_callback)
+    app.callback(
+        Output("node-config-container", "children"),
+        Output("node-config-usage", "value"),
+        Input("network-graph", "tapNodeData"),
+        Input("node-type-dropdown", "value"),
+        prevent_initial_call=True,
+    )(_update_node_config_display_callback)
+    app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Output("graph-log-table", "data", allow_duplicate=True),
@@ -232,31 +373,8 @@ def register_node_callbacks(app):
         State("network-graph", "elements"),
         State("graph-log-table", "data"),
         prevent_initial_call=True,
-    )
-    def update_node_config(config_values, node_data, elements, table_data):
-        if not node_data or not config_values:
-            return dash.no_update, dash.no_update, dash.no_update
-
-        node_id = node_data["id"]
-        config_keys = [key["id"]["index"] for key in dash.ctx.inputs_list[0]]
-
-        updated_elements = []
-        for element in elements:
-            if element.get("data") and element["data"].get("id") == node_id:
-                config = {}
-                for key, value in zip(config_keys, config_values):
-                    config[key] = value
-                element["data"]["config"] = config
-            updated_elements.append(element)
-
-        yaml_content = generate_yaml_content(updated_elements)
-        formatted_logs = format_log_with_timestamp(f"Updated config of node '{node_id}'")
-        if table_data is None:
-            table_data = []
-
-        return updated_elements, yaml_content, table_data + formatted_logs
-
-    @app.callback(
+    )(_update_node_config_callback)
+    app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
         Output("graph-log-table", "data", allow_duplicate=True),
@@ -265,40 +383,14 @@ def register_node_callbacks(app):
         State("network-graph", "elements"),
         State("graph-log-table", "data"),
         prevent_initial_call=True,
-    )
-    def update_node_type(new_type, node_data, elements, table_data):
-        if node_data and new_type:
-            node_id = node_data["id"]
-            updated_elements = []
-            for element in elements:
-                if element.get("data") and element["data"].get("id") == node_id and new_type != node_data["type"]:
-                    element["data"]["type"] = new_type
-                    element["data"]["config"] = {}  # Reset config to empty
-                updated_elements.append(element)
-            yaml_content = generate_yaml_content(updated_elements)
-            formatted_logs = format_log_with_timestamp(f"Changed type of node '{node_data['id']}' to '{new_type}'")
-            if table_data is None:
-                table_data = []
-            return (
-                updated_elements,
-                yaml_content,
-                table_data + formatted_logs,
-            )
-        return dash.no_update, dash.no_update, dash.no_update
-
-    @app.callback(
-        Output("node-config-editor", "value"),
-        Output("node-config-usage", "value"),
+    )(_update_node_type_callback)
+    app.callback(
+        Output("network-graph", "tapNodeData"),
         Input("node-type-dropdown", "value"),
         State("network-graph", "tapNodeData"),
         prevent_initial_call=True,
-    )
-    def update_node_config_and_usage(new_type, node_data):
-        if node_data:
-            return custom_yaml_dump({}), BEAM_YAML_TRANSFORMS[new_type]
-        return dash.no_update, dash.no_update
-
-    @app.callback(
+    )(_update_tap_node_data_callback)
+    app.callback(
         Output("network-graph", "elements", allow_duplicate=True),
         Output("network-graph", "tapNodeData", allow_duplicate=True),
         Output("yaml-content", "value", allow_duplicate=True),
@@ -308,45 +400,12 @@ def register_node_callbacks(app):
         State("network-graph", "elements"),
         State("graph-log-table", "data"),
         prevent_initial_call=True,
-    )
-    def update_node_id(new_node_id, node_data, elements, table_data):
-        if len(new_node_id) == 0:
-            formatted_logs = format_log_with_timestamp("Node ID cannot be empty\n")
-            if table_data is None:
-                table_data = []
-            return dash.no_update, dash.no_update, dash.no_update, table_data + formatted_logs
-        if node_data and node_data["id"] != new_node_id:
-            old_node_id = node_data["id"]
-            updated_elements = []
-            for element in elements:
-                if element.get("data") and element["data"].get("id") == old_node_id:
-                    element["data"]["id"] = new_node_id
-                    node_data = element["data"]
-                elif element.get("data") and element["data"].get("source") == old_node_id:
-                    element["data"]["source"] = new_node_id
-                    element["data"]["id"] = None
-                elif element.get("data") and element["data"].get("target") == old_node_id:
-                    element["data"]["target"] = new_node_id
-                    element["data"]["id"] = None
-                updated_elements.append(element)
-            yaml_content = generate_yaml_content(updated_elements)
-            formatted_logs = format_log_with_timestamp(f"Renamed node from '{node_data['id']}' to '{new_node_id}'\n")
-            if table_data is None:
-                table_data = []
-            return updated_elements, node_data, yaml_content, table_data + formatted_logs
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
-
-    @app.callback(
+    )(_update_node_id_callback)
+    app.callback(
         Output("run-pipeline-button", "disabled"),
         Input("run-pipeline-button", "n_clicks"),
-    )
-    def disable_run_pipeline_button(n_clicks):
-        if n_clicks is None:
-            return False  # Button starts enabled
-        else:
-            return True  # Disable after click
-
-    @app.callback(
+    )(_disable_run_pipeline_button_callback)
+    app.callback(
         Output("graph-log-table", "data", allow_duplicate=True),
         Output("run-pipeline-button", "disabled", allow_duplicate=True),
         Input("run-pipeline-button", "n_clicks"),
@@ -355,23 +414,9 @@ def register_node_callbacks(app):
         State("yaml-content", "value"),
         State("graph-log-table", "data"),
         prevent_initial_call=True,
-    )
-    def run_beam_pipeline(n_clicks, runner, pipeline_options, yaml_content, table_data):
-        if n_clicks is None:
-            return dash.no_update, dash.no_update
-
-        formatted_logs = _run_beam_pipeline(runner, pipeline_options, yaml_content, "")
-        if table_data is None:
-            table_data = []
-        return table_data + formatted_logs, False
-
-    @app.callback(
+    )(_run_beam_pipeline_callback)
+    app.callback(
         Output("graph-log-table", "data", allow_duplicate=True),
         Input("clear-graph-logs", "n_clicks"),
         prevent_initial_call=True,
-    )
-    def clear_graph_logs(n_clicks):
-        if n_clicks is None:
-            return dash.no_update
-        else:
-            return []
+    )(_clear_graph_logs_callback)
