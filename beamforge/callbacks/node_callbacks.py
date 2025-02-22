@@ -145,6 +145,21 @@ def register_node_callbacks(app):
                 ),
                 dbc.Row(
                     [
+                        dbc.Col(html.H6("Type:"), width=4),
+                        dbc.Col(
+                            dcc.Dropdown(
+                                id="node-type-dropdown",
+                                options=get_node_type_options(),
+                                value=node_data["type"],
+                                style={"border": "1px solid #ced4da", "fontSize": "14px"},
+                            ),
+                            width=8,
+                        ),
+                    ],
+                    style={"margin-bottom": "10px"},
+                ),
+                dbc.Row(
+                    [
                         dbc.Col(
                             [
                                 html.H6("Configuration:"),

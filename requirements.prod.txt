@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-apache-beam[gcp,yaml]==2.61.0
+apache-beam[gcp,yaml]==2.63.0
 pydantic<2.0.0
 torch>=1.7.1
 torchvision>=0.8.2
