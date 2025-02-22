@@ -145,29 +145,44 @@ def register_node_callbacks(app):
                 ),
                 dbc.Row(
                     [
-                        dbc.Col(html.H6("Type:"), width=4),
                         dbc.Col(
-                            dcc.Dropdown(
-                                id="node-type-dropdown",
-                                options=get_node_type_options(),
-                                value=node_data["type"],
-                                style={"border": "1px solid #ced4da", "fontSize": "14px"},
-                            ),
-                            width=8,
+                            [
+                                html.H6("Configuration:"),
+                                html.Div(
+                                    id="config-validation-status",
+                                    style={"marginBottom": "5px", "fontSize": "12px"},
+                                ),
+                            ],
+                            width=12,
                         ),
-                    ],
-                    style={"margin-bottom": "10px"},
-                ),
-                dbc.Row(
-                    [
-                        html.H6("Configuration:"),
-                        DashAceEditor(
-                            id="node-config-editor",
-                            value=custom_yaml_dump(node_data["config"]),
-                            style={"height": "200px"},
-                            theme="tomorrow",
-                            mode="yaml",
-                            maxLines=5000,
+                        dbc.Col(
+                            [
+                                DashAceEditor(
+                                    id="node-config-editor",
+                                    value=custom_yaml_dump(node_data["config"]),
+                                    style={
+                                        "height": "200px",
+                                        "border": "1px solid #ced4da",
+                                        "borderRadius": "4px",
+                                    },
+                                    theme="tomorrow",
+                                    mode="yaml",
+                                    maxLines=5000,
+                                    enableLiveAutocompletion=True,
+                                    enableBasicAutocompletion=True,
+                                    tabSize=2,
+                                ),
+                                html.Div(
+                                    id="config-error-message",
+                                    style={
+                                        "color": "#dc3545",
+                                        "fontSize": "12px",
+                                        "marginTop": "5px",
+                                        "display": "none",
+                                    },
+                                ),
+                            ],
+                            width=12,
                         ),
                     ],
                     style={"margin-bottom": "10px"},
@@ -341,3 +356,42 @@ def register_node_callbacks(app):
             return dash.no_update
         else:
             return []
+
+    @app.callback(
+        Output("config-validation-status", "children"),
+        Output("config-validation-status", "style"),
+        Output("config-error-message", "children"),
+        Output("config-error-message", "style"),
+        Input("node-config-editor", "value"),
+    )
+    def validate_yaml_config(config_value):
+        if not config_value:
+            return (
+                "Empty configuration",
+                {"color": "#6c757d", "marginBottom": "5px", "fontSize": "12px"},
+                "",
+                {"display": "none"},
+            )
+
+        try:
+            yaml.safe_load(config_value)
+            return (
+                "✓ Valid YAML",
+                {"color": "#28a745", "marginBottom": "5px", "fontSize": "12px"},
+                "",
+                {"display": "none"},
+            )
+        except yaml.YAMLError as e:
+            return (
+                "✗ Invalid YAML",
+                {"color": "#dc3545", "marginBottom": "5px", "fontSize": "12px"},
+                str(e),
+                {
+                    "color": "#dc3545",
+                    "fontSize": "12px",
+                    "marginTop": "5px",
+                    "display": "block",
+                    "whiteSpace": "pre-wrap",
+                    "fontFamily": "monospace",
+                },
+            )
