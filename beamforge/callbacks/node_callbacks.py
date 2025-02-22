@@ -15,11 +15,11 @@ from dash import Input, Output, State, dcc, html
 from dash_ace import DashAceEditor
 
 from beamforge.utils.graph_utils import custom_yaml_dump, format_log_with_timestamp, generate_yaml_content
-from beamforge.utils.transform_parser import BEAM_YAML_TRANSFORMS
+from beamforge.utils.transform_parser import BEAM_YAML_TRANSFORMS_CONFIG
 
 
 def get_node_type_options():
-    return [{"label": transform, "value": transform} for transform in BEAM_YAML_TRANSFORMS]
+    return [{"label": transform, "value": transform} for transform in BEAM_YAML_TRANSFORMS_CONFIG]
 
 
 def create_dataflow_job_name(base_name="dataflow-job"):
@@ -204,10 +204,10 @@ def register_node_callbacks(app):
                 ),
                 dbc.Row(
                     [
-                        html.H6("Usage/Example:"),
+                        html.H6("Config Usage Example:"),
                         DashAceEditor(
                             id="node-config-usage",
-                            value=BEAM_YAML_TRANSFORMS[node_data["type"]],
+                            value=BEAM_YAML_TRANSFORMS_CONFIG[node_data["type"]],
                             maxLines=5000,
                             theme="tomorrow",
                             readOnly=True,
@@ -291,7 +291,7 @@ def register_node_callbacks(app):
     )
     def update_node_config_and_usage(new_type, node_data):
         if node_data:
-            return custom_yaml_dump({}), BEAM_YAML_TRANSFORMS[new_type]
+            return custom_yaml_dump({}), BEAM_YAML_TRANSFORMS_CONFIG[new_type]
         return dash.no_update, dash.no_update
 
     @app.callback(
