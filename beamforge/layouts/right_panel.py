@@ -62,7 +62,11 @@ def create_right_panel():
                                 [
                                     html.Div(
                                         [
-                                            html.H6("Runner:"),
+                                            html.H6(
+                                                "Runner:",
+                                                className="mb-2",
+                                                style={"fontSize": "16px", "fontWeight": "500"},
+                                            ),
                                             dcc.Dropdown(
                                                 id="pipeline-runner-dropdown",
                                                 options=[
@@ -76,26 +80,42 @@ def create_right_panel():
                                                     },
                                                 ],
                                                 value="PrismRunner",
-                                                style={"border": "1px solid #ced4da", "fontSize": "14px"},
+                                                style={
+                                                    "border": "1px solid #ced4da",
+                                                    "borderRadius": "6px",
+                                                    "fontSize": "14px",
+                                                    "backgroundColor": "#ffffff",
+                                                    "boxShadow": "inset 0 1px 2px rgba(0,0,0,.05)",
+                                                },
                                             ),
                                         ],
-                                        style={"margin-bottom": "10px"},
+                                        style={"marginBottom": "20px"},
                                     ),
                                     html.Div(
                                         [
-                                            html.H6("Options:"),
+                                            html.H6(
+                                                "Options:",
+                                                className="mb-2",
+                                                style={"fontSize": "16px", "fontWeight": "500"},
+                                            ),
                                             dcc.Textarea(
                                                 id="pipeline-options-input",
                                                 placeholder="Enter other pipeline options. \n"
                                                 "Examples: --project your_gcp_project --region us-central1",
                                                 style={
                                                     "width": "100%",
-                                                    "height": "100px",
+                                                    "height": "80px",
+                                                    "padding": "10px",
                                                     "border": "1px solid #ced4da",
+                                                    "borderRadius": "6px",
                                                     "fontSize": "14px",
+                                                    "backgroundColor": "#ffffff",
+                                                    "boxShadow": "inset 0 1px 2px rgba(0,0,0,.05)",
+                                                    "resize": "vertical",
                                                 },
                                             ),
-                                        ]
+                                        ],
+                                        style={"marginBottom": "10px"},
                                     ),
                                 ]
                             )

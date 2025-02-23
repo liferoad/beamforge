@@ -220,7 +220,7 @@ def register_node_callbacks(app):
                             [
                                 dbc.Col(
                                     [
-                                        html.H6("Config Usage Example:", className="mb-2"),
+                                        html.H6("Example:", className="mb-2"),
                                         DashAceEditor(
                                             id="node-config-usage",
                                             value=BEAM_YAML_TRANSFORMS_CONFIG[node_data["type"]],
