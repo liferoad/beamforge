@@ -1,5 +1,4 @@
 # standard libraries
-# standard libraries
 import datetime
 import os
 import random
@@ -125,99 +124,132 @@ def register_node_callbacks(app):
         if not node_data:
             return "Click a node to see its details"
 
-        # Create a formatted display of node data using dbc.Card with a custom background color
-        details = dbc.Container(
+        # Create a formatted display of node data using dbc.Card with modern styling
+        details = dbc.Card(
             [
-                dbc.Row(
+                dbc.CardBody(
                     [
-                        dbc.Col(html.H6("Name:"), width=4),
-                        dbc.Col(
-                            dcc.Input(
-                                id="node-id-input",
-                                value=node_data["id"],
-                                type="text",
-                                style={"border": "1px solid #ced4da", "fontSize": "14px"},
-                            ),
-                            width=8,
-                        ),
-                    ],
-                    style={"margin-bottom": "10px"},
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(html.H6("Type:"), width=4),
-                        dbc.Col(
-                            dcc.Dropdown(
-                                id="node-type-dropdown",
-                                options=get_node_type_options(),
-                                value=node_data["type"],
-                                style={"border": "1px solid #ced4da", "fontSize": "14px"},
-                            ),
-                            width=8,
-                        ),
-                    ],
-                    style={"margin-bottom": "10px"},
-                ),
-                dbc.Row(
-                    [
-                        dbc.Col(
+                        dbc.Row(
                             [
-                                html.H6("Configuration:"),
-                                html.Div(
-                                    id="config-validation-status",
-                                    style={"marginBottom": "5px", "fontSize": "12px"},
+                                dbc.Col(html.H6("Name:", className="mb-0"), width=4),
+                                dbc.Col(
+                                    dcc.Input(
+                                        id="node-id-input",
+                                        value=node_data["id"],
+                                        type="text",
+                                        style={
+                                            "border": "1px solid #ced4da",
+                                            "borderRadius": "4px",
+                                            "padding": "8px 12px",
+                                            "fontSize": "14px",
+                                            "width": "100%",
+                                            "backgroundColor": "#ffffff",
+                                            "transition": "border-color .15s ease-in-out",
+                                        },
+                                    ),
+                                    width=8,
                                 ),
                             ],
-                            width=12,
+                            className="mb-3 align-items-center",
                         ),
-                        dbc.Col(
+                        dbc.Row(
                             [
-                                DashAceEditor(
-                                    id="node-config-editor",
-                                    value=custom_yaml_dump(node_data["config"]),
-                                    style={
-                                        "height": "200px",
-                                        "border": "1px solid #ced4da",
-                                        "borderRadius": "4px",
-                                    },
-                                    theme="tomorrow",
-                                    mode="yaml",
-                                    maxLines=5000,
-                                    enableLiveAutocompletion=True,
-                                    enableBasicAutocompletion=True,
-                                    tabSize=2,
-                                ),
-                                html.Div(
-                                    id="config-error-message",
-                                    style={
-                                        "color": "#dc3545",
-                                        "fontSize": "12px",
-                                        "marginTop": "5px",
-                                        "display": "none",
-                                    },
+                                dbc.Col(html.H6("Type:", className="mb-0"), width=4),
+                                dbc.Col(
+                                    dcc.Dropdown(
+                                        id="node-type-dropdown",
+                                        options=get_node_type_options(),
+                                        value=node_data["type"],
+                                        style={
+                                            "fontSize": "14px",
+                                            "width": "100%",
+                                        },
+                                    ),
+                                    width=8,
                                 ),
                             ],
-                            width=12,
+                            className="mb-3 align-items-center",
                         ),
-                    ],
-                    style={"margin-bottom": "10px"},
-                ),
-                dbc.Row(
-                    [
-                        html.H6("Config Usage Example:"),
-                        DashAceEditor(
-                            id="node-config-usage",
-                            value=BEAM_YAML_TRANSFORMS_CONFIG[node_data["type"]],
-                            maxLines=5000,
-                            theme="tomorrow",
-                            readOnly=True,
-                            mode="yaml",
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        html.H6("Configuration:", className="mb-2"),
+                                        html.Div(
+                                            id="config-validation-status",
+                                            style={
+                                                "fontSize": "12px",
+                                                "fontWeight": "500",
+                                                "marginBottom": "8px",
+                                            },
+                                        ),
+                                        DashAceEditor(
+                                            id="node-config-editor",
+                                            value=custom_yaml_dump(node_data["config"]),
+                                            style={
+                                                "height": "200px",
+                                                "border": "1px solid #ced4da",
+                                                "borderRadius": "4px",
+                                                "boxShadow": "inset 0 1px 2px rgba(0,0,0,.05)",
+                                                "width": "100%",
+                                                "maxWidth": "100%",
+                                            },
+                                            theme="tomorrow",
+                                            mode="yaml",
+                                            maxLines=5000,
+                                            enableLiveAutocompletion=True,
+                                            enableBasicAutocompletion=True,
+                                            tabSize=2,
+                                        ),
+                                        html.Div(
+                                            id="config-error-message",
+                                            style={
+                                                "color": "#dc3545",
+                                                "fontSize": "12px",
+                                                "marginTop": "8px",
+                                                "display": "none",
+                                            },
+                                        ),
+                                    ],
+                                    width=12,
+                                ),
+                            ],
+                            className="mb-3",
                         ),
-                    ],
-                    style={"margin-bottom": "5px"},
-                ),
+                        dbc.Row(
+                            [
+                                dbc.Col(
+                                    [
+                                        html.H6("Config Usage Example:", className="mb-2"),
+                                        DashAceEditor(
+                                            id="node-config-usage",
+                                            value=BEAM_YAML_TRANSFORMS_CONFIG[node_data["type"]],
+                                            style={
+                                                "border": "1px solid #ced4da",
+                                                "borderRadius": "4px",
+                                                "backgroundColor": "#f8f9fa",
+                                                "width": "100%",
+                                                "maxWidth": "100%",
+                                            },
+                                            maxLines=5000,
+                                            theme="tomorrow",
+                                            readOnly=True,
+                                            mode="yaml",
+                                        ),
+                                    ],
+                                    width=12,
+                                ),
+                            ],
+                            className="mb-2",
+                        ),
+                    ]
+                )
             ],
-            fluid=True,
+            style={
+                "boxShadow": "0 2px 4px rgba(0,0,0,.05)",
+                "border": "1px solid #ced4da",
+                "borderRadius": "6px",
+            },
         )
 
         return html.Div(details)
