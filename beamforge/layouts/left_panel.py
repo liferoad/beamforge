@@ -106,8 +106,8 @@ def create_left_panel():
                             maxLines=5000,
                             style={
                                 "margin": "10px",
-                                "width": "100%",
-                                "maxWidth": "100%",
+                                "width": "calc(100% - 20px)",
+                                "maxWidth": "calc(100% - 20px)",
                             },
                         ),
                     ],
