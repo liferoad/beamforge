@@ -171,9 +171,12 @@ def create_middle_panel():
                                             ],
                                             style_table={
                                                 "width": "100%",
-                                                "maxHeight": "20vh",
+                                                "height": "100%",
                                                 "overflowY": "auto",
                                                 "overflowX": "auto",
+                                                "resize": "vertical",
+                                                "minHeight": "10vh",
+                                                "maxHeight": "50vh",
                                             },
                                             style_data={
                                                 "whiteSpace": "normal",
