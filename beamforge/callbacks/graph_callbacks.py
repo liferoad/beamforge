@@ -56,6 +56,7 @@ def register_graph_callbacks(app):
 
     @app.callback(
         Output("network-graph", "zoom"),
+        Output("network-graph", "layout"),
         Input("zoom-in", "n_clicks"),
         Input("zoom-out", "n_clicks"),
         Input("reset-view", "n_clicks"),
@@ -66,12 +67,13 @@ def register_graph_callbacks(app):
         ctx = dash.callback_context
 
         if not ctx.triggered:
-            return dash.no_update
+            return dash.no_update, dash.no_update
 
         triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         # Use the current zoom level as the base
         zoom_level = current_zoom if current_zoom is not None else 1.0  # Default to 1.0 if None
+        layout = None
 
         if triggered_id == "zoom-in":
             zoom_level += 0.1  # Increase zoom level
@@ -80,8 +82,18 @@ def register_graph_callbacks(app):
             zoom_level = max(0.1, zoom_level)  # Prevent zooming out too much
         elif triggered_id == "reset-view":
             zoom_level = 1.0  # Reset zoom to default
+            layout = {
+                "name": "dagre",
+                "rankDir": "TB",
+                "rankSep": 30,
+                "nodeSep": 50,
+                "padding": 10,
+                "animate": True,
+                "fit": True,
+                "spacingFactor": 1.5,
+            }
 
-        return zoom_level
+        return zoom_level, layout
 
     @app.callback(
         Output("delete-selected", "disabled"),
