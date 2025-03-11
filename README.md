@@ -2,7 +2,11 @@
 
 ## Description
 
-This project provides a Dash app for visually building and managing Beam pipelines using Beam YAML.
+A Dash app for visually building and managing Beam pipelines using Beam YAML.
+
+## About
+
+This is a side project to explore how to build the UI with Dash to support using Beam YAML to build Beam pipelines. Contributions are welcome, and the use of GenAI to enhance the project is encouraged.
 
 ## File Structure
 
